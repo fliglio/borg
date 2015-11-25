@@ -22,8 +22,8 @@ class RabbitDriver implements MessagingDriver {
 	public function go($type, $method, array $data) {
 		
 		
-		$ch = $conn->channel();
-		$ch->exchange_declare(self::EXCHANGE, 'topic', false, false, false);
+		$ch = $this->conn->channel();
+		$ch->exchange_declare(self::EXCHANGE, 'topic', false, true, false);
 		
 		
 		$msg = new AMQPMessage(json_encode($data), array('content_type' => 'application/json'));
