@@ -1,6 +1,7 @@
-[![Build Status](https://travis-ci.org/fliglio/routing.svg?branch=master)](https://travis-ci.org/fliglio/routing)
-[![Latest Stable Version](https://poser.pugx.org/fliglio/routing/v/stable.svg)](https://packagist.org/packages/fliglio/routing)
+[![Build Status](https://travis-ci.org/fliglio/borg.svg?branch=master)](https://travis-ci.org/fliglio/borg)
+[![Latest Stable Version](https://poser.pugx.org/fliglio/borg/v/stable.svg)](https://packagist.org/packages/fliglio/borg)
 
-# Fliglio.Routing
+
+# Fliglio.Borg
 
 
