@@ -1,6 +1,6 @@
 <?php
 
-namespace Fliglio\MessagingDriver;
+namespace Fliglio\Borg;
 
 interface MessagingDriver {
 	public function createChanDriver();

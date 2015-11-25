@@ -10,17 +10,20 @@
     ],
     "require": {
         "php": ">=5.3",
+		"fliglio/http":    "dev-master",
 		"fliglio/web":     "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.1.0"
     },
     "autoload": {
-        "psr-0": { "Fliglio\\Routing\\": "" }
+        "psr-0": {
+			"Fliglio\\Borg\\": ""
+		}
     },
     "autoload-dev": {
         "psr-0": {
-            "Fliglio" : "src/Fliglio"
+            "Fliglio" : "test/"
         }
     }
 }

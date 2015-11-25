@@ -1,6 +1,6 @@
 <?php
 
-namespace Fliglio\Scheduler;
+namespace Fliglio\Borg;
 
 
 class Scheduler {
