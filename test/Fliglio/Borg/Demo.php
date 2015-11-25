@@ -2,6 +2,8 @@
 
 namespace Fliglio\Borg;
 
+use Fliglio\Borg\Type\Scalar;
+
 class Demo {
 
 	private $go;
@@ -22,26 +24,27 @@ class Demo {
 			$this->go->getWordsForLink($link, $words, $exits);
 		}
 
-		$success = true;
-
+		$allWords = [];
 		$exitCount = 0;
 
-		$allWords = [];
-
-		$reader = $this->go->makeChanReader()
-			->handle($words, function($word) {
-				$allWords[] = $chanEntity;
-			})
-			->handle($exits, function($exit) {
-				if ($chanEntity == false) {
-					$success = false;
-				}
-				$exitCount++;
-			});
-
+		$reader = new ChanReader([$words, $exits]);
 		while ($exitCount < $links->length()) {
-			$reader->next();
+			list($chanId, $chEntity) = $reader->next();
+
+			switch ($chanId) {
+			case $words->getId():
+				$allWords[] = $word;
+				break;
+			case $exits->getId():
+				$exitCount++;
+				break;
+			default:
+				usleep(200); // 200 microseconds
+			}
 		}
+
+		$exits->close();
+		$words->close();
 
 		return array_count_values($allWords);
 	}
@@ -51,9 +54,9 @@ class Demo {
 
 		$wordsArr = split(' +', $txt);
 		foreach ($wordsArr as $wordStr) {
-			$words->send($wordStr);
+			$words->push($wordStr);
 		}
-		$exits->send(true);
+		$exits->push(true);
 	}
 
 }

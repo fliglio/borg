@@ -4,19 +4,21 @@ namespace Fliglio\Borg;
 
 class ChanReader {
 	
-	private $driver;
+	private $chans;
 
-	public function __construct(MessageDriver $driver) {
-		$this->driver = $driver;
+	public function __construct(array $chans) {
+		$this->chans = $chans;
 	}
 
-	public function handle(Chan $chan, $handler) {
-
-		return $this;
-	}
 
 	public function next() {
-	
+		foreach ($chans as $chan) {
+			list($found, $entity) = $chan->get();
+			if ($found) {
+				return [$chan->getId(), $entity];
+			}
+		}
+		return [false, null];
 	}
 	
 }
