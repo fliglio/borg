@@ -10,6 +10,7 @@
     ],
     "require": {
         "php": ">=5.3",
+		"videlalvaro/php-amqplib": "2.5.*",
 		"fliglio/http":    "dev-master",
 		"fliglio/web":     "dev-master"
     },
