@@ -1,6 +1,6 @@
 <?php
 
-namespace Fliglio\Borg;
+namespace Fliglio\Borg\Chan;
 
 interface ChanDriver {
 	public function getId();

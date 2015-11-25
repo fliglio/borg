@@ -1,6 +1,6 @@
 <?php
 
-namespace Fliglio\Borg;
+namespace Fliglio\Borg\Chan;
 
 use Fliglio\Web\MappableApi;
 

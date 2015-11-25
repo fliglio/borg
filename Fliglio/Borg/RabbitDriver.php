@@ -5,6 +5,8 @@ namespace Fliglio\Borg;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
+use Fliglio\Borg\Chan\RabbitChanDriver;
+
 class RabbitDriver implements MessagingDriver {
 
 	const EXCHANGE = "borg";

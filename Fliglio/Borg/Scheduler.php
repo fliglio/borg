@@ -14,10 +14,6 @@ class Scheduler {
 	}
 
 
-	public function makechan($type) {
-		return new Chan($type, $driver->createChanDriver());
-	}
-
 	public function __call($method, array $args) {
 
 		$data = [];
