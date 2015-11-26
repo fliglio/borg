@@ -3,16 +3,22 @@
 namespace Fliglio\Borg;
 
 
-class Scheduler {
+class Collective {
 
-	private $type;
+	private $inst;
 	private $driver;
 
-	public function __construct($type, MessagingDriver $driver) {
-		$this->type = $type;
+	public function __construct(MessagingDriver $driver) {
 		$this->driver = $driver;
 	}
-
+	
+	public function setInstance($i) {
+		$this->inst = $i;
+	}
+	
+	public function getInstance() {
+		return $this->inst;
+	}
 
 	public function __call($method, array $args) {
 
@@ -25,6 +31,8 @@ class Scheduler {
 			$data[] = $arg->marshal();
 		}
 
-		$this->driver->go($this->type, $method, $data);
+		$className = get_class($this->inst);
+		$topicBase = str_replace("\\", ".", $className);
+		$this->driver->go($topicBase, $method, $data);
 	}
 }

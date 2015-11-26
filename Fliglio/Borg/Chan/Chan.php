@@ -3,20 +3,24 @@
 namespace Fliglio\Borg\Chan;
 
 use Fliglio\Web\MappableApi;
+use Fliglio\Borg\MessagingDriver;
+use Fliglio\Borg\Chan\ChanDriver;
 
 class Chan {
 
+	private $id;
 	private $type;
 	private $driver;
 
-	public function __construct($type, ChanDriver $driver) {
+	public function __construct($type, MessagingDriver $driver) {
+		$this->id = uniqid();
 		$this->type = $type;
-		$this->driver = $driver;
+		$this->driver = new ChanDriver($driver, $this->id);
 
 	}
 
 	public function getId() {
-		$this->driver->getId();
+		return $this->id;
 	}
 
 	public function push(MappableApi $entity) {

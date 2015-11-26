@@ -5,7 +5,6 @@ namespace Fliglio\Borg;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
-use Fliglio\Borg\Chan\RabbitChanDriver;
 
 class RabbitDriver implements MessagingDriver {
 
@@ -17,10 +16,6 @@ class RabbitDriver implements MessagingDriver {
 		$this->conn = $conn;
 	}
 	
-	public function createChanDriver() {
-		return new RabbitChanDriver();
-	}
-
 	public function go($type, $method, array $data) {
 		
 		

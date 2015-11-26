@@ -6,17 +6,14 @@ use Fliglio\Borg\MessagingDriver;
 
 class ChanFactory {
 
-	private $type;
 	private $driver;
 
-	public function __construct($type, MessagingDriver $driver) {
-		$this->type = $type;
+	public function __construct(MessagingDriver $driver) {
 		$this->driver = $driver;
 	}
 
-
-	public function makechan($type) {
-		return new Chan($type, $driver->createChanDriver());
+	public function mkchan($type) {
+		return new Chan($type, $driver);
 	}
 }
 
