@@ -6,11 +6,11 @@ use Fliglio\Borg\Chan\ChanFactory;
 
 trait BorgImplant {
 
-	private $collective;
+	private $collectiveWrapper;
 	private $chanFactory;
 
-	protected function coll() {
-		return $this->collective;
+	public function coll() {
+		return $this->collectiveWrapper;
 	}
 
 	protected function mkchan($type) {
@@ -18,8 +18,8 @@ trait BorgImplant {
 	}
 
 	public function setCollective(Collective $c) {
-		$c->setInstance($this);
-		$this->collective = $c;
+		$c->addCollectiveAgent($this);
+		$this->collectiveWrapper = new CollectiveWrapper($this, $c);
 	}
 	public function setChanFactory(ChanFactory $c) {
 		$this->chanFactory = $c;

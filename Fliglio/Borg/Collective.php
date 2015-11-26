@@ -5,22 +5,30 @@ namespace Fliglio\Borg;
 
 class Collective {
 
-	private $inst;
+	private $agents = [];
 	private $driver;
 
 	public function __construct(MessagingDriver $driver) {
 		$this->driver = $driver;
 	}
 	
-	public function setInstance($i) {
-		$this->inst = $i;
-	}
-	
-	public function getInstance() {
-		return $this->inst;
+	public function addCollectiveAgent($i) {
+		$this->agents[] = $i;
 	}
 
-	public function __call($method, array $args) {
+	public function getCollectiveAgent($type) {
+		foreach ($this->agents as $agent) {
+			if ($type == get_class($agent)) {
+				return $agent;
+			}
+		}
+		throw new \Exception("agent ".$type."not found");
+	}
+	public function getCollectiveAgents() {
+		return $this->agents;
+	}
+
+	public function dispatch($collectiveAgent, $method, array $args) {
 
 		$data = [];
 
@@ -31,7 +39,7 @@ class Collective {
 			$data[] = $arg->marshal();
 		}
 
-		$className = get_class($this->inst);
+		$className = get_class($collectiveAgent);
 		$topicBase = str_replace("\\", ".", $className);
 		$this->driver->go($topicBase, $method, $data);
 	}

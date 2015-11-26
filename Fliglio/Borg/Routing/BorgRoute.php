@@ -20,7 +20,15 @@ class BorgRoute extends StaticRoute {
 	}
 
 
-	public function getResourceInstance() {
+	public function getResourceInstance(RequestReader $r) {
+		if ($r->isHeaderSet("X-routing_key")) {
+			$topic = $r->getHeader("X-routing_key");
+			$parts = explode(".", $topic);
+			array_pop($parts);
+			$type = implode("\\", $parts);
+			return $this->getCollective()->getCollectiveAgent($type);
+		}
+		throw new \Exception("x-routing_key not set");
 		return $this->getCollective()->getInstance();
 	}
 	public function getResourceMethod(RequestReader $r) {
