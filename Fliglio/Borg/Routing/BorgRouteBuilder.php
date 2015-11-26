@@ -88,7 +88,7 @@ class BorgRouteBuilder extends RouteBuilder {
 
 	public function build() {
 		$route = new BorgRoute($this->uriTemplate, $this->params);
-
+		$route->setCollective($this->collective);
 		
 		$route->setKey($this->key);
 		$route->setProtocol($this->protocol);
