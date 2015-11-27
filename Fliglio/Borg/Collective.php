@@ -29,6 +29,9 @@ class Collective {
 		$this->agents[] = $i;
 	}
 
+	/**
+	 * Create a new Chan and return it
+	 */
 	public function mkchan($type) {
 		return new Chan($type, $this->driver);
 	}
@@ -65,12 +68,12 @@ class Collective {
 		}
 		$topic = $r->getHeader("X-routing_key");
 		$parts = explode(".", $topic);
-	
+
 		$method = array_pop($parts);
 		array_shift($parts);
 		array_shift($parts);
 		$type = implode("\\", $parts);
-		
+
 		$inst = $this->getCollectiveAgent($type);
 
 
@@ -80,7 +83,7 @@ class Collective {
 		return $rMethod->invokeArgs($inst, $args);
 
 	}
-	
+
 	private function getCollectiveAgent($type) {
 		foreach ($this->agents as $agent) {
 			if ($type == get_class($agent)) {
@@ -103,7 +106,7 @@ class Collective {
 			return self::getReflectionMethod($parentClassName, $methodName);
 		}
 	}
-	
+
 	private function getMethodArgs(\ReflectionMethod $rMethod, $body) {
 		$argEntities = [];
 
@@ -111,9 +114,9 @@ class Collective {
 		$params = $rMethod->getParameters();
 
 		for ($i = 0; $i < count($argArr); $i++) {
-			
+
 			$type = $params[$i]->getClass()->getName();
-			
+
 			if (in_array('Fliglio\Web\MappableApi', class_implements($type))) {
 				$argEntities[] = $type::unmarshal($argArr[$i]);
 			} else if ($type == Chan::CLASSNAME) {
