@@ -17,6 +17,11 @@ class AmqpCollectiveDriver implements CollectiveDriver {
 	public function __construct(AMQPStreamConnection $conn) {
 		$this->conn = $conn;
 	}
+	
+	public function createChan($id = null) {
+		return new AmqpChanDriver($this->conn, $id);
+	}
+
 
 	// send message
 	public function go($routingKey, array $data) {

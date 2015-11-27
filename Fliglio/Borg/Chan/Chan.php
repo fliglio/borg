@@ -7,18 +7,19 @@ use Fliglio\Borg\MessagingDriver;
 use Fliglio\Borg\Chan\ChanDriver;
 
 class Chan {
+	const CLASSNAME = __CLASS__;
 
 	private $id;
 	private $type;
 	private $driver;
 
-	public function __construct($type, ChanDriverFactory $factory, $id = null) {
+	public function __construct($type, CollectionDriver $factory, $id = null) {
 		$this->type = $type;
 		
 		if (is_null($id)) {
-			$this->driver = $factory->create();
+			$this->driver = $factory->createChan();
 		} else {
-			$this->driver = $factory->create($id);
+			$this->driver = $factory->createChan($id);
 		}
 	}
 

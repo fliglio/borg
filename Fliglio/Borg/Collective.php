@@ -2,13 +2,13 @@
 
 namespace Fliglio\Borg;
 
-use Fliglio\Borg\Chan\ChanFactory;
-use Fliglio\Borg\Chan\ChanDriverFactory;
+use Fliglio\Borg\Chan\Chan;
 
 use Fliglio\Http\RequestReader;
 
 class Collective {
 	const DEFAULT_NS = "default";
+
 	private $agents = [];
 	private $driver;
 
@@ -22,23 +22,32 @@ class Collective {
 	}
 
 	/**
-	 * Keep copy of instance being assimilated and register the collective & chanfactory on the instance
-	 */	
-	public function assimilate($i, ChanDriverFactory $chFD) {
+	 * Keep a copy of instance being assimilated and register the collective & chanfactory on the instance
+	 */
+	public function assimilate($i) {
 		$i->setCollective($this);
-		$i->setChanFactory(new ChanFactory($chFD));
 		$this->agents[] = $i;
 	}
 
+	public function mkchan($type) {
+		return new Chan($type, $this->driver);
+	}
+
+	/**
+	 * Dispatch a new call
+	 */
 	public function dispatch($collectiveAgent, $method, array $args) {
 
 		$data = [];
 
 		foreach ($args as $arg) {
-			if (!in_array('Fliglio\Web\MappableApi', class_implements($arg))) {
-				throw new \Exception($entityType . " doesn't implement Fliglio\Web\MappableApi");
+			if (in_array('Fliglio\Web\MappableApi', class_implements($arg))) {
+				$data[] = $arg->marshal();
+			} else if ($arg instanceof Chan) {
+				$data[] = $arg->getId();
+			} else {
+				throw new \Exception($entityType . " can't be marshalled");
 			}
-			$data[] = $arg->marshal();
 		}
 
 		$className = get_class($collectiveAgent);
@@ -47,6 +56,9 @@ class Collective {
 		$this->driver->go($topic, $data);
 	}
 
+	/**
+	 * Handle incoming request resulting from a `dispatch`
+	 */
 	public function mux(RequestReader $r) {
 		if (!$r->isHeaderSet("X-routing_key")) {
 			throw new \Exception("x-routing_key not set");
@@ -58,7 +70,7 @@ class Collective {
 		array_shift($parts);
 		array_shift($parts);
 		$type = implode("\\", $parts);
-
+		
 		$inst = $this->getCollectiveAgent($type);
 
 
@@ -68,6 +80,7 @@ class Collective {
 		return $rMethod->invokeArgs($inst, $args);
 
 	}
+	
 	private function getCollectiveAgent($type) {
 		foreach ($this->agents as $agent) {
 			if ($type == get_class($agent)) {
@@ -101,11 +114,14 @@ class Collective {
 			
 			$type = $params[$i]->getClass()->getName();
 			
-			if (!in_array('Fliglio\Web\MappableApi', class_implements($type))) {
-				throw new \Exception($entityType . " doesn't implement Fliglio\Web\MappableApi");
+			if (in_array('Fliglio\Web\MappableApi', class_implements($type))) {
+				$argEntities[] = $type::unmarshal($argArr[$i]);
+			} else if ($type == Chan::CLASSNAME) {
+				$argEntities[] = new Chan($type, $this->driver, $argArr[$i]);
+			} else {
+				throw new \Exception($type . " can't be unmarshalled");
 			}
 
-			$argEntities[] = $type::unmarshal($argArr[$i]);
 		}
 
 		return $argEntities;

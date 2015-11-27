@@ -13,6 +13,9 @@ class CollectiveWrapper {
 		$this->collective = $c;
 	}
 	
+	public function mkchan($type) {
+		return $this->collective->mkchan($type);
+	}
 
 	public function __call($method, array $args) {
 		$this->collective->dispatch($this->collectiveAgent, $method, $args);
