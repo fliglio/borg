@@ -1,12 +1,13 @@
 <?php
 
-namespace Fliglio\Borg;
+namespace Fliglio\Borg\Amqp;
 
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
+use Fliglio\Borg\CollectiveDriver;
 
-class RabbitDriver implements MessagingDriver {
+class AmqpCollectiveDriver implements CollectiveDriver {
 
 	const EXCHANGE = "borg";
 

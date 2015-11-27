@@ -12,25 +12,29 @@ class Chan {
 	private $type;
 	private $driver;
 
-	public function __construct($type, MessagingDriver $driver) {
-		$this->id = uniqid();
+	public function __construct($type, ChanDriverFactory $factory, $id = null) {
 		$this->type = $type;
-		$this->driver = $driver;
+		
+		if (is_null($id)) {
+			$this->driver = $factory->create();
+		} else {
+			$this->driver = $factory->create($id);
+		}
 	}
 
 	public function getId() {
-		return $this->id;
+		return $this->driver->getId();
 	}
 
-	public function push(MappableApi $entity) {
+	public function add(MappableApi $entity) {
 		if (!in_array($this->type, class_implements($entity))) {
 			throw new \Exception($entityType . " doesn't implement " . $this->type);
 		}
-		$this->driver->push($this->getId(), $entity->marshal());
+		$this->driver->add($entity->marshal());
 	}
 
 	public function get() {
-		$resp = $this->driver->get($this->getId());
+		$resp = $this->driver->get();
 		if (is_null($resp)) {
 			return [false, null];
 		}
@@ -40,6 +44,6 @@ class Chan {
 	}
 
 	public function close() {
-		$this->driver->closeChan($this->getId());
+		$this->driver->close();
 	}
 }

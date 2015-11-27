@@ -3,6 +3,7 @@
 namespace Fliglio\Borg;
 
 use Fliglio\Borg\Chan\ChanFactory;
+use Fliglio\Borg\Chan\ChanDriverFactory;
 
 use Fliglio\Http\RequestReader;
 
@@ -14,15 +15,18 @@ class Collective {
 	private $svcNs;
 	private $additionalNs;
 
-	public function __construct(MessagingDriver $driver, $svcNs, $additionalNs = self::DEFAULT_NS) {
+	public function __construct(CollectiveDriver $driver, $svcNs, $additionalNs = self::DEFAULT_NS) {
 		$this->driver = $driver;
 		$this->svcNs = $svcNs;
 		$this->additionalNs = $additionalNs;
 	}
-	
-	public function assimilate($i) {
+
+	/**
+	 * Keep copy of instance being assimilated and register the collective & chanfactory on the instance
+	 */	
+	public function assimilate($i, ChanDriverFactory $chFD) {
 		$i->setCollective($this);
-		$i->setChanFactory(new ChanFactory($this->driver));
+		$i->setChanFactory(new ChanFactory($chFD));
 		$this->agents[] = $i;
 	}
 
