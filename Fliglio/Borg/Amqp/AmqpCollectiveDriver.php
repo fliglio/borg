@@ -12,41 +12,34 @@ class AmqpCollectiveDriver implements CollectiveDriver {
 	const EXCHANGE = "borg";
 
 	private $conn;
+	private $ch;
 
 	public function __construct(AMQPStreamConnection $conn) {
 		$this->conn = $conn;
 	}
-	
+
+	// send message
 	public function go($routingKey, array $data) {
 		
 		
-		$ch = $this->conn->channel();
-		$ch->exchange_declare(self::EXCHANGE, 'topic', false, true, false);
-		
+		$ch = $this->getChannel();
 		
 		$msg = new AMQPMessage(json_encode($data), array('content_type' => 'application/json'));
 
 
 		$ch->basic_publish($msg, self::EXCHANGE, $routingKey);
-		$ch->close();
-	}
-	
-	// submit $data as msg body
-	public function push($id, array $data) {
-	
 	}
 
-	// return array, null for none found
-	public function get($id) {
-	
-	}
-
-	// close & delete connection/queue
-	public function closeChan($id) {
-	
-	}
 	// close & delete connection/queue
 	public function close() {
-	
+		$this->ch->close();
+	}
+
+	private function getChannel() {
+		if (!isset($this->ch)) {
+			$this->ch = $this->conn->channel();
+			$this->ch->exchange_declare(self::EXCHANGE, 'topic', false, true, false);
+		}
+		return $this->ch;
 	}
 }

@@ -38,4 +38,23 @@ class AmqpChanDriver implements ChanDriver {
 	public function close() {
 	
 	}
+	
+	private function getChannel() {
+		if (!isset($this->ch)) {
+			$queueName = "borg-".$this->getId();
+			$ch = $this->conn->channel();
+
+			/*
+			    name: $queue
+			    passive: false
+			    durable: true // the queue will survive server restarts
+			    exclusive: false // the queue can be accessed in other channels
+			    auto_delete: false //the queue won't be deleted once the channel is closed.
+			*/
+			$ch->queue_declare($queue, false, true, false, false);
+		
+			$ch->queue_bind($queue, "");
+		}
+		return $this->ch;
+	}
 }
