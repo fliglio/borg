@@ -16,7 +16,7 @@ class RabbitDriver implements MessagingDriver {
 		$this->conn = $conn;
 	}
 	
-	public function go($type, $method, array $data) {
+	public function go($routingKey, array $data) {
 		
 		
 		$ch = $this->conn->channel();
@@ -25,10 +25,27 @@ class RabbitDriver implements MessagingDriver {
 		
 		$msg = new AMQPMessage(json_encode($data), array('content_type' => 'application/json'));
 
-		$routingKey = $type . "." . $method;
 
 		$ch->basic_publish($msg, self::EXCHANGE, $routingKey);
 		$ch->close();
+	}
+	
+	// submit $data as msg body
+	public function push($id, array $data) {
+	
+	}
 
+	// return array, null for none found
+	public function get($id) {
+	
+	}
+
+	// close & delete connection/queue
+	public function closeChan($id) {
+	
+	}
+	// close & delete connection/queue
+	public function close() {
+	
 	}
 }

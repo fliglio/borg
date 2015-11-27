@@ -2,18 +2,27 @@
 
 namespace Fliglio\Borg;
 
+use Fliglio\Borg\Chan\ChanFactory;
+
 use Fliglio\Http\RequestReader;
 
 class Collective {
-
+	const DEFAULT_NS = "default";
 	private $agents = [];
 	private $driver;
 
-	public function __construct(MessagingDriver $driver) {
+	private $svcNs;
+	private $additionalNs;
+
+	public function __construct(MessagingDriver $driver, $svcNs, $additionalNs = self::DEFAULT_NS) {
 		$this->driver = $driver;
+		$this->svcNs = $svcNs;
+		$this->additionalNs = $additionalNs;
 	}
 	
-	public function addCollectiveAgent($i) {
+	public function assimilate($i) {
+		$i->setCollective($this);
+		$i->setChanFactory(new ChanFactory($this->driver));
 		$this->agents[] = $i;
 	}
 
@@ -29,8 +38,9 @@ class Collective {
 		}
 
 		$className = get_class($collectiveAgent);
-		$topicBase = str_replace("\\", ".", $className);
-		$this->driver->go($topicBase, $method, $data);
+		$topicClass = str_replace("\\", ".", $className);
+		$topic = $this->svcNs . '.' . $this->additionalNs . '.' . $topicClass . '.' . $method;
+		$this->driver->go($topic, $data);
 	}
 
 	public function mux(RequestReader $r) {
@@ -41,6 +51,8 @@ class Collective {
 		$parts = explode(".", $topic);
 	
 		$method = array_pop($parts);
+		array_shift($parts);
+		array_shift($parts);
 		$type = implode("\\", $parts);
 
 		$inst = $this->getCollectiveAgent($type);

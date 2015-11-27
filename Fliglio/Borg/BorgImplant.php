@@ -18,7 +18,6 @@ trait BorgImplant {
 	}
 
 	public function setCollective(Collective $c) {
-		$c->addCollectiveAgent($this);
 		$this->collectiveWrapper = new CollectiveWrapper($this, $c);
 	}
 	public function setChanFactory(ChanFactory $c) {

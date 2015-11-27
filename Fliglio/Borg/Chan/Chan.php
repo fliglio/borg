@@ -15,8 +15,7 @@ class Chan {
 	public function __construct($type, MessagingDriver $driver) {
 		$this->id = uniqid();
 		$this->type = $type;
-		$this->driver = new ChanDriver($driver, $this->id);
-
+		$this->driver = $driver;
 	}
 
 	public function getId() {
@@ -27,11 +26,11 @@ class Chan {
 		if (!in_array($this->type, class_implements($entity))) {
 			throw new \Exception($entityType . " doesn't implement " . $this->type);
 		}
-		$this->driver->push($entity->marshal());
+		$this->driver->push($this->getId(), $entity->marshal());
 	}
 
 	public function get() {
-		$resp = $this->driver->get();
+		$resp = $this->driver->get($this->getId());
 		if (is_null($resp)) {
 			return [false, null];
 		}
@@ -41,6 +40,6 @@ class Chan {
 	}
 
 	public function close() {
-		$this->driver->close();
+		$this->driver->closeChan($this->getId());
 	}
 }
