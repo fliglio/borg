@@ -11,7 +11,7 @@ trait BorgImplant {
 	private $chanFactory;
 
 	public function coll() {
-		return $this->az(CollectiveWrapper::DEFAULT_AZ);
+		return $this->az(Collective::DEFAULT_AZ);
 	}
 
 	protected function mkchan($type) {

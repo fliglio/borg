@@ -7,6 +7,7 @@ use Fliglio\Borg\Chan\Chan;
 use Fliglio\Http\RequestReader;
 
 class Collective {
+	const DEFAULT_AZ = "default";
 	const DEFAULT_NS = "default";
 
 	private $agents = [];
@@ -32,14 +33,14 @@ class Collective {
 	/**
 	 * Create a new Chan and return it
 	 */
-	public function mkchan($type) {
+	public function mkchan($type, $dc) {
 		return new Chan($type, $this->driver);
 	}
 
 	/**
 	 * Dispatch a new call
 	 */
-	public function dispatch($collectiveAgent, $method, array $args) {
+	public function dispatch($collectiveAgent, $method, array $args, $dc) {
 
 		$data = [];
 
