@@ -3,9 +3,9 @@
 namespace Fliglio\Borg\Chan;
 
 use Fliglio\Web\MappableApi;
-use Fliglio\Borg\MessagingDriver;
+use Fliglio\Borg\CollectiveDriver;
 use Fliglio\Borg\Chan\ChanDriver;
-
+use Fliglio\Borg\Type\Primitive;
 class Chan {
 	const CLASSNAME = __CLASS__;
 
@@ -13,7 +13,7 @@ class Chan {
 	private $type;
 	private $driver;
 
-	public function __construct($type, CollectionDriver $factory, $id = null) {
+	public function __construct($type, CollectiveDriver $factory, $id = null) {
 		$this->type = $type;
 		
 		if (is_null($id)) {
@@ -22,14 +22,17 @@ class Chan {
 			$this->driver = $factory->createChan($id);
 		}
 	}
+	public function getType() {
+		return $this->type;
+	}
 
 	public function getId() {
 		return $this->driver->getId();
 	}
 
 	public function add(MappableApi $entity) {
-		if (!in_array($this->type, class_implements($entity))) {
-			throw new \Exception($entityType . " doesn't implement " . $this->type);
+		if (!is_a($entity, $this->type)) {
+			throw new \Exception("add entity doesn't implement " . $this->type);
 		}
 		$this->driver->add($entity->marshal());
 	}
@@ -37,7 +40,7 @@ class Chan {
 	public function get() {
 		$resp = $this->driver->get();
 		if (is_null($resp)) {
-			return [false, null];
+			return [null, null];
 		}
 
 		$t = $this->type;

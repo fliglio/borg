@@ -43,24 +43,33 @@ class Collective {
 	 * @todo impl az
 	 */
 	public function dispatch($collectiveAgent, $method, array $args, $dc) {
-
-		$data = [];
-
-		foreach ($args as $arg) {
-			if (in_array('Fliglio\Web\MappableApi', class_implements($arg))) {
-				$data[] = $arg->marshal();
-			} else if ($arg instanceof Chan) {
-				$data[] = $arg->getId();
-			} else {
-				throw new \Exception($entityType . " can't be marshalled");
-			}
-		}
+		$data = self::marshalArgs($args);
 
 		$className = get_class($collectiveAgent);
 		$topicClass = str_replace("\\", ".", $className);
 		$topic = $this->svcNs . '.' . $this->additionalNs . '.' . $topicClass . '.' . $method;
 		$this->driver->go($topic, $data);
 	}
+	
+	public static function marshalArgs(array $args) {
+		$data = [];
+
+		foreach ($args as $arg) {
+			$data[] = self::marshalArg($arg);
+		}
+		return $data;
+	}
+
+	public static function marshalArg($arg) {
+	
+		if (in_array('Fliglio\Web\MappableApi', class_implements($arg))) {
+			return $arg->marshal();
+		} else if ($arg instanceof Chan) {
+			return ["type" => $arg->getType(), "id" => $arg->getId()];
+		}
+		throw new \Exception("arg can't be marshalled");
+	}
+
 
 	/**
 	 * Handle incoming request resulting from a `dispatch`
@@ -113,7 +122,7 @@ class Collective {
 	private function getMethodArgs(\ReflectionMethod $rMethod, $body) {
 		$argEntities = [];
 
-		$argArr = json_decode($body);
+		$argArr = json_decode($body, true);
 		$params = $rMethod->getParameters();
 
 		for ($i = 0; $i < count($argArr); $i++) {
@@ -123,7 +132,7 @@ class Collective {
 			if (in_array('Fliglio\Web\MappableApi', class_implements($type))) {
 				$argEntities[] = $type::unmarshal($argArr[$i]);
 			} else if ($type == Chan::CLASSNAME) {
-				$argEntities[] = new Chan($type, $this->driver, $argArr[$i]);
+				$argEntities[] = new Chan($argArr[$i]["type"], $this->driver, $argArr[$i]["id"]);
 			} else {
 				throw new \Exception($type . " can't be unmarshalled");
 			}
