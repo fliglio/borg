@@ -32,6 +32,7 @@ class Collective {
 
 	/**
 	 * Create a new Chan and return it
+	 * @todo impl az
 	 */
 	public function mkchan($type, $dc) {
 		return new Chan($type, $this->driver);
@@ -39,6 +40,7 @@ class Collective {
 
 	/**
 	 * Dispatch a new call
+	 * @todo impl az
 	 */
 	public function dispatch($collectiveAgent, $method, array $args, $dc) {
 
