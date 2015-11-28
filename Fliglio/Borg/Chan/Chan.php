@@ -37,8 +37,8 @@ class Chan {
 		$this->driver->add($entity->marshal());
 	}
 
-	public function get() {
-		$resp = $this->driver->get();
+	public function get($noBlock=false) {
+		$resp = $this->driver->get($noBlock);
 		if (is_null($resp)) {
 			return [null, null];
 		}

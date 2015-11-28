@@ -43,7 +43,25 @@ class AmqpChanDriver implements ChanDriver {
 	}
 
 	// return array, null for none found
-	public function get() {
+	public function get($noBlock=false) {
+		if ($noBlock) {
+			return $this->nonBlockingGet();
+		} else {
+			return $this->blockingGet();
+		}
+	}
+	private function blockingGet() {
+		$msg = null;
+		while (is_null($msg)) {
+			$msg = $this->ch->basic_get($this->queueName);
+			usleep(200);
+		}
+		$this->ch->basic_ack($msg->delivery_info['delivery_tag']);
+		
+		$data =  json_decode($msg->body);
+		return $data;
+	}
+	private function nonBlockingGet() {
 		$msg = $this->ch->basic_get($this->queueName);
 		if (is_null($msg)) {
 			return null;
