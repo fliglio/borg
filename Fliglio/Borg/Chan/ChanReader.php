@@ -13,7 +13,7 @@ class ChanReader {
 
 	public function get() {
 		while (true) {
-			foreach ($chans as $chan) {
+			foreach ($this->chans as $chan) {
 				list($found, $entity) = $chan->getnb();
 				if ($found) {
 					return [$chan->getId(), $entity];

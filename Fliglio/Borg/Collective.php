@@ -75,10 +75,10 @@ class Collective {
 	 * Handle incoming request resulting from a `dispatch`
 	 */
 	public function mux(RequestReader $r) {
-		if (!$r->isHeaderSet("X-routing_key")) {
+		if (!$r->isHeaderSet("X-routingkey")) {
 			throw new \Exception("x-routing_key not set");
 		}
-		$topic = $r->getHeader("X-routing_key");
+		$topic = $r->getHeader("X-routingkey");
 		$parts = explode(".", $topic);
 
 		$method = array_pop($parts);
