@@ -7,19 +7,20 @@ use Fliglio\Borg\Chan\Chan;
 use Fliglio\Http\RequestReader;
 
 class Collective {
-	const DEFAULT_AZ = "default";
-	const DEFAULT_NS = "default";
-
 	private $agents = [];
 	private $driver;
 
 	private $svcNs;
-	private $additionalNs;
+	private $defaultDc;
 
-	public function __construct(CollectiveDriver $driver, $svcNs, $additionalNs = self::DEFAULT_NS) {
+	public function __construct(CollectiveDriver $driver, $svcNs, $defaultDc) {
 		$this->driver = $driver;
 		$this->svcNs = $svcNs;
-		$this->additionalNs = $additionalNs;
+		$this->defaultDc = $defaultDc;
+	}
+
+	public function getDefaultDc() {
+		return $this->defaultDc;
 	}
 
 	/**
@@ -47,7 +48,7 @@ class Collective {
 
 		$className = get_class($collectiveAgent);
 		$topicClass = str_replace("\\", ".", $className);
-		$topic = $this->svcNs . '.' . $this->additionalNs . '.' . $topicClass . '.' . $method;
+		$topic = $this->svcNs . '.' . $dc . '.' . $topicClass . '.' . $method;
 		$this->driver->go($topic, $data);
 	}
 	

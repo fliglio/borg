@@ -10,7 +10,7 @@ class CollectiveWrapper {
 	private $collective;
 	private $dc;
 
-	public function __construct($agent, Collective $c, $dc = Collective::DEFAULT_AZ) {
+	public function __construct($agent, Collective $c, $dc) {
 		$this->collectiveAgent = $agent;
 		$this->collective = $c;
 		$this->dc = $dc;

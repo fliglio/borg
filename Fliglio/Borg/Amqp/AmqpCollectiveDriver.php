@@ -25,7 +25,7 @@ class AmqpCollectiveDriver implements CollectiveDriver {
 
 	// send message
 	public function go($routingKey, array $data) {
-		
+		error_log("routing_key: ".$routingKey);
 		
 		$ch = $this->getChannel();
 		

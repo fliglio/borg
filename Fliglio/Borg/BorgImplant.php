@@ -11,7 +11,7 @@ trait BorgImplant {
 	private $chanFactory;
 
 	public function coll() {
-		return $this->az(Collective::DEFAULT_AZ);
+		return $this->az($this->collective->getDefaultDc());
 	}
 
 	protected function mkchan($type) {
@@ -20,7 +20,7 @@ trait BorgImplant {
 
 	public function az($name) {
 		if (!isset($this->availabilityZones[$name])) {
-			$this->availabilityZones[$name] = new CollectiveWrapper($this, $this->collective);
+			$this->availabilityZones[$name] = new CollectiveWrapper($this, $this->collective, $name);
 		}
 		return $this->availabilityZones[$name];
 	}
