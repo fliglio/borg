@@ -6,6 +6,7 @@ use Fliglio\Borg\Chan\ChanDriver;
 
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
+use PhpAmqpLib\Wire\AMQPTable;
 
 class AmqpChanDriver implements ChanDriver {
 
@@ -16,18 +17,17 @@ class AmqpChanDriver implements ChanDriver {
 	private $queueName;
 
 	private $msgCache;
-	private $consumerNum = 0;
 
 	public function __construct(AMQPStreamConnection $conn, $id = null) {
 		$this->conn = $conn;
 
-		if (is_null($id)) {
-			$id = uniqid();
-		}
+		//if (is_null($id)) {
+		//	$id = uniqid();
+		//}
 		$this->id = $id;
 
-		$this->queueName = "borg.".$id;
-		$this->exchangeName = "";
+		$this->queueName = $id;
+		$this->exchangeName = "borgchan";
 		$this->initChannel();
 	}
 	
@@ -42,6 +42,11 @@ class AmqpChanDriver implements ChanDriver {
 			'content_type' => 'application/json', 
 			'delivery_mode' => 2
 		));
+		//msg
+		//exchange
+		//routing_key
+		//mandatory
+		//immediate
 		$this->ch->basic_publish($msg, $this->exchangeName, $this->queueName);
 	}
 
@@ -53,6 +58,18 @@ class AmqpChanDriver implements ChanDriver {
 			return $this->blockingGet();
 		}
 	}
+	
+	private function blockingGet() {
+		$msg = null;
+		while (is_null($msg)) {
+			$msg = $this->ch->basic_get($this->queueName);
+			usleep(1000);
+		}
+		$this->ch->basic_ack($msg->delivery_info['delivery_tag']);
+		
+		$data =  json_decode($msg->body);
+		return $data;
+	}
 	/*
 	private function blockingGet() {
 		// queue: Queue from where to get the messages
@@ -62,7 +79,8 @@ class AmqpChanDriver implements ChanDriver {
 		// exclusive: Request exclusive consumer access, meaning only this consumer can access the queue
 		// nowait:
 		// callback: A PHP Callback
-		$this->ch->basic_consume($this->queueName, "consumer_".$this->consumerNum++, false, false, false, false, function($msg) {
+		$this->ch->basic_consume($this->queueName, '', false, false, false, false, function($msg) {
+			error_log($msg->body);
 			$this->msgCache = json_decode($msg->body);
 			$this->ch->basic_ack($msg->delivery_info['delivery_tag']);
 			$this->ch->basic_cancel($msg->delivery_info['consumer_tag']);
@@ -73,17 +91,6 @@ class AmqpChanDriver implements ChanDriver {
 		return $this->msgCache;
 	}
 	 */
-	private function blockingGet() {
-		$msg = null;
-		while (is_null($msg)) {
-			$msg = $this->ch->basic_get($this->queueName);
-			usleep(200);
-		}
-		$this->ch->basic_ack($msg->delivery_info['delivery_tag']);
-		
-		$data =  json_decode($msg->body);
-		return $data;
-	}
 	private function nonBlockingGet() {
 		$msg = $this->ch->basic_get($this->queueName);
 		if (is_null($msg)) {
@@ -103,24 +110,37 @@ class AmqpChanDriver implements ChanDriver {
 	private function initChannel() {
 		$ch = $this->conn->channel();
 		
-		/*
-		    name: $queue
-		    passive: false
-		    durable: true // the queue will survive server restarts
-		    exclusive: false // the queue can be accessed in other channels
-		    auto_delete: false //the queue won't be deleted once the channel is closed.
-		*/
-		$ch->queue_declare($this->queueName, false, true, false, false);
-		/*
-		    name: $exchange
-		    type: direct
-		    passive: false
-		    durable: true // the exchange will survive server restarts
-		    auto_delete: false //the exchange won't be deleted once the channel is closed.
-		*/
-		//$ch->exchange_declare($this->exchangeName, 'direct', false, true, false);
+		// name: $queue
+		// passive: false
+		// durable: true // the queue will survive server restarts
+		// exclusive: false // the queue can be accessed in other channels
+		// auto_delete: false //the queue won't be deleted once the channel is closed.
+		// nowait: false
+		// args: null
+		//$ch->queue_declare($this->queueName, false, true, true, false);
+		if (is_null($this->queueName)) {
+			list($queueName, , ) = $ch->queue_declare(
+				"", false, false, false, 
+				false, false, new AMQPTable(['x-expires' => 10000])
+			);
 
-		//$ch->queue_bind($this->queueName, $this->exchangeName);
+			$this->queueName = $queueName;
+			$this->id = $queueName;
+		}
+		$ch->basic_qos(null, 1, null);
+		// name: $exchange
+		// type: direct
+		// passive: false
+		// durable: true // the exchange will survive server restarts
+		// auto_delete: false //the exchange won't be deleted once the channel is closed.
+		$ch->exchange_declare($this->exchangeName, 'direct', false, false, true);
+
+		// queue
+		// exchange
+		// routing_key
+		// nowait
+		// args	
+		$ch->queue_bind($this->queueName, $this->exchangeName, $this->queueName, false);
 		$this->ch = $ch;
 	}
 }

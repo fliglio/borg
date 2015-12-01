@@ -19,7 +19,7 @@ class ChanReader {
 					return [$chan->getId(), $entity];
 				}
 			}
-			usleep(200);
+			usleep(1000); // 1 millisecond
 		}
 	}
 
