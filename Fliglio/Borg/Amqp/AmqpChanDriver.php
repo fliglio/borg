@@ -133,14 +133,14 @@ class AmqpChanDriver implements ChanDriver {
 		// passive: false
 		// durable: true // the exchange will survive server restarts
 		// auto_delete: false //the exchange won't be deleted once the channel is closed.
-		$ch->exchange_declare($this->exchangeName, 'direct', false, false, true);
+		$ch->exchange_declare($this->exchangeName, 'direct', false, false, false);
 
 		// queue
 		// exchange
 		// routing_key
 		// nowait
-		// args	
-		$ch->queue_bind($this->queueName, $this->exchangeName, $this->queueName, false);
+		// args
+		$ch->queue_bind($this->queueName, $this->exchangeName, $this->queueName);
 		$this->ch = $ch;
 	}
 }
