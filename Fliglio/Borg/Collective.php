@@ -7,20 +7,27 @@ use Fliglio\Borg\Chan\Chan;
 use Fliglio\Http\RequestReader;
 
 class Collective {
+	const DEFAULT_DC = "default";
+
 	private $agents = [];
 	private $driver;
 
 	private $svcNs;
+	private $cubeDc;
 	private $defaultDc;
 
-	public function __construct(CollectiveDriver $driver, $svcNs, $defaultDc) {
+	public function __construct(CollectiveDriver $driver, $svcNs, $cubeDc, $defaultDc = self::DEFAULT_DC) {
 		$this->driver = $driver;
 		$this->svcNs = $svcNs;
+		$this->cubeDc = $cubeDc;
 		$this->defaultDc = $defaultDc;
 	}
 
 	public function getDefaultDc() {
 		return $this->defaultDc;
+	}
+	public function getCubeDc() {
+		return $this->cubeDc;
 	}
 
 	/**

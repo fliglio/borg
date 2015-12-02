@@ -10,15 +10,22 @@ trait BorgImplant {
 	private $availabilityZones = [];
 	private $chanFactory;
 
+	// run a routine in the master datacenter
+	public function cube() {
+		return $this->az($this->collective->getCubeDc());
+	}
+
+	// run a routine in your current dataqcenter
 	public function coll() {
 		return $this->az($this->collective->getDefaultDc());
 	}
-
+	
+	// only supported for local datacenter usage
 	protected function mkchan($type) {
 		return $this->coll()->mkchan($type);
 	}
 
-	public function az($name) {
+	private function az($name) {
 		if (!isset($this->availabilityZones[$name])) {
 			$this->availabilityZones[$name] = new CollectiveWrapper($this, $this->collective, $name);
 		}
