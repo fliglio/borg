@@ -14,6 +14,9 @@ class Chan {
 	private $driver;
 
 	public function __construct($type, CollectiveDriver $factory, $id = null) {
+		if (!in_array('Fliglio\Web\MappableApi', class_implements($type))) {
+			throw new \Exception(sprintf("Type '%s' doesn't implement MappableApi", $type));
+		}
 		$this->type = $type;
 		
 		if (is_null($id)) {
@@ -30,7 +33,10 @@ class Chan {
 		return $this->driver->getId();
 	}
 
-	public function add(MappableApi $entity) {
+	public function add($entity) {
+		if (!is_object($entity)) {
+			$entity = new Primitive($entity);
+		}
 		if (!is_a($entity, $this->type)) {
 			throw new \Exception("add entity doesn't implement " . $this->type);
 		}
@@ -40,7 +46,11 @@ class Chan {
 	public function get() {
 		$resp = $this->driver->get(false);
 		$t = $this->type;
-		return $t::unmarshal($resp);
+		$e = $t::unmarshal($resp);
+		if (is_a($e, Primitive::getClass())) {
+			return $e->value();
+		}
+		return $e;
 	}
 	public function getnb() {
 		$resp = $this->driver->get(true);

@@ -9,7 +9,7 @@ use Fliglio\Http\RequestReader;
 class Collective {
 	const DEFAULT_DC = "default";
 
-	private $agents = [];
+	private $drones = [];
 	private $driver;
 
 	private $svcNs;
@@ -35,7 +35,7 @@ class Collective {
 	 */
 	public function assimilate($i) {
 		$i->setCollective($this);
-		$this->agents[] = $i;
+		$this->drones[] = $i;
 	}
 
 	/**
@@ -50,10 +50,10 @@ class Collective {
 	 * Dispatch a new call
 	 * @todo impl az
 	 */
-	public function dispatch($collectiveAgent, $method, array $args, $dc) {
+	public function dispatch($collectiveDrone, $method, array $args, $dc) {
 		$data = self::marshalArgs($args);
 
-		$className = get_class($collectiveAgent);
+		$className = get_class($collectiveDrone);
 		$topicClass = str_replace("\\", ".", $className);
 		$topic = $this->svcNs . '.' . $dc . '.' . $topicClass . '.' . $method;
 		$this->driver->go($topic, $data);
@@ -70,8 +70,15 @@ class Collective {
 
 	public static function marshalArg($arg) {
 	
-		if (in_array('Fliglio\Web\MappableApi', class_implements($arg))) {
+		// unwrapper primitive
+		if (!is_object($arg)) {
+			return $arg;
+
+		// object of type MappableApi
+		} else if (in_array('Fliglio\Web\MappableApi', class_implements($arg))) {
 			return $arg->marshal();
+
+		// object of type Chan
 		} else if ($arg instanceof Chan) {
 			return ["type" => $arg->getType(), "id" => $arg->getId()];
 		}
@@ -94,7 +101,7 @@ class Collective {
 		array_shift($parts);
 		$type = implode("\\", $parts);
 
-		$inst = $this->getCollectiveAgent($type);
+		$inst = $this->getCollectiveDrone($type);
 
 
 		$rMethod = $this->getReflectionMethod($inst, $method);
@@ -104,13 +111,13 @@ class Collective {
 
 	}
 
-	private function getCollectiveAgent($type) {
-		foreach ($this->agents as $agent) {
-			if ($type == get_class($agent)) {
-				return $agent;
+	private function getCollectiveDrone($type) {
+		foreach ($this->drones as $drone) {
+			if ($type == get_class($drone)) {
+				return $drone;
 			}
 		}
-		throw new \Exception("agent ".$type."not found");
+		throw new \Exception("drone ".$type."not found");
 	}
 
 	private function getReflectionMethod($className, $methodName) {
@@ -134,17 +141,24 @@ class Collective {
 		$params = $rMethod->getParameters();
 
 		for ($i = 0; $i < count($argArr); $i++) {
+			$cl = $params[$i]->getClass();
+			
+			// handle when a primitive without a hint is expected
+			if (is_null($cl)) {
+				$argEntities[] = $argArr[$i];
 
-			$type = $params[$i]->getClass()->getName();
-
-			if (in_array('Fliglio\Web\MappableApi', class_implements($type))) {
-				$argEntities[] = $type::unmarshal($argArr[$i]);
-			} else if ($type == Chan::CLASSNAME) {
-				$argEntities[] = new Chan($argArr[$i]["type"], $this->driver, $argArr[$i]["id"]);
+			// handle MappableApi & Chan hints
 			} else {
-				throw new \Exception($type . " can't be unmarshalled");
-			}
+				$type = $cl->getName();
 
+				if (in_array('Fliglio\Web\MappableApi', class_implements($type))) {
+					$argEntities[] = $type::unmarshal($argArr[$i]);
+				} else if ($type == Chan::CLASSNAME) {
+					$argEntities[] = new Chan($argArr[$i]["type"], $this->driver, $argArr[$i]["id"]);
+				} else {
+					throw new \Exception($type . " can't be unmarshalled");
+				}
+			}
 		}
 
 		return $argEntities;
