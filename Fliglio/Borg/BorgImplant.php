@@ -21,7 +21,8 @@ trait BorgImplant {
 	}
 	
 	// only supported for local datacenter usage
-	protected function mkchan($type) {
+	// null type means "Primitive"
+	protected function mkchan($type = null) {
 		return $this->coll()->mkchan($type);
 	}
 

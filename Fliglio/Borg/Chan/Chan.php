@@ -12,13 +12,15 @@ class Chan {
 	const CLASSNAME = __CLASS__;
 
 	private $id;
-	private $type;
+	private $type; // chan type, or null for primitive
 	private $factory;
 	private $driver;
 
 	public function __construct($type, CollectiveDriver $factory, $id = null) {
-		if (!in_array('Fliglio\Web\MappableApi', class_implements($type))) {
-			throw new \Exception(sprintf("Type '%s' doesn't implement MappableApi", $type));
+		if (!is_null($type)) {
+			if (!in_array('Fliglio\Web\MappableApi', class_implements($type))) {
+				throw new \Exception(sprintf("Type '%s' doesn't implement MappableApi", $type));
+			}
 		}
 		$this->type = $type;
 		$this->factory = $factory;
@@ -38,8 +40,14 @@ class Chan {
 	}
 
 	public function add($entity) {
-		if (is_object($entity) &&!is_a($entity, $this->type)) {
-			throw new \Exception("add entity doesn't implement " . $this->type);
+		if (is_null($this->type)) {
+			if (is_object($entity)) {
+				throw new \Exception("This Chan::add() expects a primitive");
+			}
+		} else {
+			if (!is_object($entity) || !is_a($entity, $this->type)) {
+				throw new \Exception(sprintf("This Chan::add() expects a %s", $this->type));
+			}
 		}
 		$this->driver->add(ArgParser::marshalArg($entity));
 	}
@@ -47,8 +55,7 @@ class Chan {
 	public function get() {
 		$resp = $this->driver->get(false);
 
-		$type = $this->type == Primitive::getClass() ? null : $this->type;
-		return ArgParser::unmarshalArg($this->factory, $type, $resp);
+		return ArgParser::unmarshalArg($this->factory, $this->type, $resp);
 	}
 
 	public function getnb() {
@@ -56,10 +63,9 @@ class Chan {
 		if (is_null($resp)) {
 			return [null, null];
 		}
-		$type = $this->type == Primitive::getClass() ? null : $this->type;
 		return [
 			$this->getId(),
-			ArgParser::unmarshalArg($this->factory, $type, $resp)
+			ArgParser::unmarshalArg($this->factory, $this->type, $resp)
 		];
 	}
 
