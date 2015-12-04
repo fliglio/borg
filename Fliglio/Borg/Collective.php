@@ -51,7 +51,7 @@ class Collective {
 	 * @todo impl az
 	 */
 	public function dispatch($collectiveDrone, $method, array $args, $dc) {
-		$data = self::marshalArgs($args);
+		$data = ArgParser::marshalArgs($args);
 
 		$className = get_class($collectiveDrone);
 		$topicClass = str_replace("\\", ".", $className);
@@ -59,32 +59,6 @@ class Collective {
 		$this->driver->go($topic, $data);
 	}
 	
-	public static function marshalArgs(array $args) {
-		$data = [];
-
-		foreach ($args as $arg) {
-			$data[] = self::marshalArg($arg);
-		}
-		return $data;
-	}
-
-	public static function marshalArg($arg) {
-	
-		// unwrapper primitive
-		if (!is_object($arg)) {
-			return $arg;
-
-		// object of type MappableApi
-		} else if (in_array('Fliglio\Web\MappableApi', class_implements($arg))) {
-			return $arg->marshal();
-
-		// object of type Chan
-		} else if ($arg instanceof Chan) {
-			return ["type" => $arg->getType(), "id" => $arg->getId()];
-		}
-		throw new \Exception("arg can't be marshalled");
-	}
-
 
 	/**
 	 * Handle incoming request resulting from a `dispatch`
@@ -93,7 +67,25 @@ class Collective {
 		if (!$r->isHeaderSet("X-routing-key")) {
 			throw new \Exception("x-routing-key not set");
 		}
+
 		$topic = $r->getHeader("X-routing-key");
+
+		list($type, $method) = self::parseTopic($topic);
+
+		$inst = $this->lookupDrone($type);
+
+		$rMethod = self::getReflectionMethod($inst, $method);
+		
+		$args = ArgParser::unmarshalArgs(
+			$this->driver, 
+			self::getTypesFromReflectionMethod($rMethod),
+			json_decode($r->getBody(), true)
+		);
+
+		return $rMethod->invokeArgs($inst, $args);
+	}
+
+	private function parseTopic($topic) {
 		$parts = explode(".", $topic);
 
 		$method = array_pop($parts);
@@ -101,17 +93,10 @@ class Collective {
 		array_shift($parts);
 		$type = implode("\\", $parts);
 
-		$inst = $this->getCollectiveDrone($type);
-
-
-		$rMethod = $this->getReflectionMethod($inst, $method);
-		$args = $this->getMethodArgs($rMethod, $r->getBody());
-
-		return $rMethod->invokeArgs($inst, $args);
-
+		return [$type, $method];
 	}
 
-	private function getCollectiveDrone($type) {
+	private function lookupDrone($type) {
 		foreach ($this->drones as $drone) {
 			if ($type == get_class($drone)) {
 				return $drone;
@@ -120,47 +105,34 @@ class Collective {
 		throw new \Exception("drone ".$type."not found");
 	}
 
-	private function getReflectionMethod($className, $methodName) {
+	private static function getReflectionMethod($className, $methodName) {
 		try {
 			return new \ReflectionMethod($className, $methodName);
 		} catch (\ReflectionException $e) {
 			$rClass = new \ReflectionClass($className);
 			$parentRClass = $rClass->getParentClass();
 			if (!is_object($parentRClass)) {
-				throw new CommandNotFoundException("Method '{$methodName}' does not exist");
+				throw new \Exception("Method '{$methodName}' does not exist");
 			}
 			$parentClassName = $parentRClass->getName();
 			return self::getReflectionMethod($parentClassName, $methodName);
 		}
 	}
 
-	private function getMethodArgs(\ReflectionMethod $rMethod, $body) {
-		$argEntities = [];
-
-		$argArr = json_decode($body, true);
+	private static function getTypesFromReflectionMethod(\ReflectionMethod $rMethod) {
 		$params = $rMethod->getParameters();
 
-		for ($i = 0; $i < count($argArr); $i++) {
-			$cl = $params[$i]->getClass();
+		$types = [];
+		foreach ($params as $param) {
+			$cl = $param->getClass();
 			
-			// handle when a primitive without a hint is expected
 			if (is_null($cl)) {
-				$argEntities[] = $argArr[$i];
-
-			// handle MappableApi & Chan hints
+				$types[] = null;
 			} else {
-				$type = $cl->getName();
-
-				if (in_array('Fliglio\Web\MappableApi', class_implements($type))) {
-					$argEntities[] = $type::unmarshal($argArr[$i]);
-				} else if ($type == Chan::CLASSNAME) {
-					$argEntities[] = new Chan($argArr[$i]["type"], $this->driver, $argArr[$i]["id"]);
-				} else {
-					throw new \Exception($type . " can't be unmarshalled");
-				}
+				$types[] = $cl->getName();
 			}
 		}
 
-		return $argEntities;
+		return $types;
 	}
 }
