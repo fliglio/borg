@@ -1,7 +1,7 @@
 NAME=borg
 
 LOCAL_DEV_PORT=8000
-LOCAL_DEV_IMAGE=fliglio/local-dev:borg
+LOCAL_DEV_IMAGE=fliglio/local-dev
 
 
 clean: clean-localdev clean-test
