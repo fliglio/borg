@@ -1,0 +1,13 @@
+endpoints:
+  -
+    name: Borg
+    servicehost: http://localhost
+    uri: /borg
+    method: POST
+    consumerstrategy: topic
+    queueconfig:
+      topicname: "borg-demo.default.#"
+      queuename: borg
+      exchangename: borg
+      prefetch: 5
+

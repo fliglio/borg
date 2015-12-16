@@ -8,6 +8,13 @@ use Fliglio\Fli\Configuration\DefaultConfiguration;
 
 use GuzzleHttp\Client;
 
+use Fliglio\Borg\Amqp\AmqpCollectiveDriver;
+use Fliglio\Borg\Amqp\AmqpChanDriverFactory;
+use Fliglio\Borg\Collective;
+use Fliglio\Borg\Chan\ChanFactory;
+
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+
 class TestConfiguration extends DefaultConfiguration {
 
 
@@ -16,8 +23,16 @@ class TestConfiguration extends DefaultConfiguration {
 	}
 
 	public function getRoutes() {
-
+		$rConn = new AMQPStreamConnection('localhost', 5672, "guest", "guest", "/");
+		$driver = new AmqpCollectiveDriver($rConn);
+	
 		$resource = $this->getTestResource();
+		
+
+		$coll = new Collective($driver, "borg-demo", 'default');
+		$coll->assimilate($resource);
+
+
 
 		return [
 			RouteBuilder::get()
@@ -25,7 +40,13 @@ class TestConfiguration extends DefaultConfiguration {
 				->resource($resource, 'test')
 				->method(Http::METHOD_GET)
 				->build(),
-					
+					// Router for all Borg Collective calls
+			RouteBuilder::get()
+				->uri('/borg')
+				->resource($coll, "mux")
+				->method(Http::METHOD_POST)
+				->build(),
+
 		];
 	}
 

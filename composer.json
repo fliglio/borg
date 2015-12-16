@@ -25,7 +25,8 @@
 		"symfony/validator": "2.*",
 		"doctrine/annotations": "1.*",
 		"doctrine/cache": "1.*",
-		"guzzlehttp/guzzle": "~5.0"
+		"guzzlehttp/guzzle": "~5.0",
+		"videlalvaro/php-amqplib": "2.5.*"
     },
     "autoload": {
         "psr-0": {
