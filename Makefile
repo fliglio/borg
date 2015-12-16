@@ -1,7 +1,7 @@
 NAME=borg
 
 LOCAL_DEV_PORT=8000
-LOCAL_DEV_IMAGE=fliglio/local-dev
+LOCAL_DEV_IMAGE=fliglio/rabbitmq
 
 
 clean: clean-localdev clean-test
@@ -18,7 +18,7 @@ clean-localdev:
 		if test "$$ID" != ""; then docker rm $$ID; fi
 
 run: clean-localdev
-	docker run -p $(LOCAL_DEV_PORT):80 -p 3306 -v $(CURDIR)/:/var/www/ --name $(NAME) $(LOCAL_DEV_IMAGE) 
+	docker run -p $(LOCAL_DEV_PORT):80 -p 8508:8500 -p 15678:15672 -v $(CURDIR)/:/var/www/ --name $(NAME) $(LOCAL_DEV_IMAGE) 
 
 
 #

@@ -21,6 +21,7 @@
 		"fliglio/routing": "dev-master",
 		"fliglio/http":    "dev-master",
 		"fliglio/web":     "dev-master",
+		"fliglio/chinchilla":     "dev-master",
 		"symfony/validator": "2.*",
 		"doctrine/annotations": "1.*",
 		"doctrine/cache": "1.*",
