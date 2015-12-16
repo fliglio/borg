@@ -2,7 +2,6 @@
 namespace Fliglio\Borg;
 
 
-
 class BorgTest extends \PHPUnit_Framework_TestCase {
 
 
@@ -10,6 +9,7 @@ class BorgTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testBorg() {
+
 	}
 
 }
