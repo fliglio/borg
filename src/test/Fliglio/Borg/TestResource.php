@@ -30,7 +30,7 @@ class TestResource {
 	public function fibonacci(GetParam $terms) {
 		$ch = $this->mkChan();
 
-		$this->coll()->fibNum($ch, 1, 1);
+		$this->coll()->fibNum($ch, 1, 1, $terms->get());
 
 		$collected = [];
 		for ($i = 0; $i < $terms->get(); $i++) {
@@ -38,8 +38,10 @@ class TestResource {
 		}
 		return $collected;
 	}
-	public function fibNum(Chan $ch, $a, $b) {
+	public function fibNum(Chan $ch, $a, $b, $terms) {
 		$ch->add($a);
-		$this->coll()->fibNum($ch, $b, $a+$b);
+		if ($terms <= 10) {
+			$this->coll()->fibNum($ch, $b, $a+$b, $terms--);
+		}
 	}
 }
