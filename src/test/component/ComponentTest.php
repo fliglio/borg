@@ -32,10 +32,10 @@ class ComponentTest extends \PHPUnit_Framework_TestCase {
 	
 	public function testPi() {
 		// given
-		$expected = 3.141593;
+		$expected = pi();
 
 		// when
-		$resp = $this->client->get($this->add."/pi?terms=100");
+		$resp = $this->client->get($this->add."/pi?terms=50");
 
 
 		// then
