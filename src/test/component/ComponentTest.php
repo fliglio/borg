@@ -29,4 +29,16 @@ class ComponentTest extends \PHPUnit_Framework_TestCase {
 		// then
 		$this->assertEquals($expected, $resp->json());
 	}
+	
+	public function testPi() {
+		// given
+		$expected = 3.141593;
+
+		// when
+		$resp = $this->client->get($this->add."/pi?terms=100");
+
+
+		// then
+		$this->assertEquals($expected, $resp->json(), '', 0.00001); // floating delta comparison
+	}
 }

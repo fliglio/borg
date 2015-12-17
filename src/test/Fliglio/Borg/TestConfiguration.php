@@ -45,6 +45,11 @@ class TestConfiguration extends DefaultConfiguration {
 				->resource($resource, 'fibonacci')
 				->method(Http::METHOD_GET)
 				->build(),
+			RouteBuilder::get()
+				->uri('/pi')
+				->resource($resource, 'pi')
+				->method(Http::METHOD_GET)
+				->build(),
 		
 			// Router for all Borg Collective calls
 			RouteBuilder::get()
