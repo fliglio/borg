@@ -19,4 +19,14 @@ class ComponentTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals("hello world", $resp->json());
 	}
 
+	public function testFibonacci() {
+		// given
+		$expected = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55];
+
+		// when
+		$resp = $this->client->get($this->add."/fibonacci?terms=10");
+
+		// then
+		$this->assertEquals($expected, $resp->json());
+	}
 }

@@ -40,7 +40,13 @@ class TestConfiguration extends DefaultConfiguration {
 				->resource($resource, 'test')
 				->method(Http::METHOD_GET)
 				->build(),
-					// Router for all Borg Collective calls
+			RouteBuilder::get()
+				->uri('/fibonacci')
+				->resource($resource, 'fibonacci')
+				->method(Http::METHOD_GET)
+				->build(),
+		
+			// Router for all Borg Collective calls
 			RouteBuilder::get()
 				->uri('/borg')
 				->resource($coll, "mux")

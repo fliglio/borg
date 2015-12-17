@@ -13,7 +13,7 @@ use Fliglio\Borg\Chan\ChanReader;
 class TestResource {
 	use BorgImplant;
 
-	
+	// basic round trip
 	public function test(GetParam $msg) {
 		error_log("in test");
 		$ch = $this->mkChan();
@@ -26,5 +26,20 @@ class TestResource {
 		$ch->add($msg . " world");
 	}
 
+	// recursively determine the fibonacci sequence
+	public function fibonacci(GetParam $terms) {
+		$ch = $this->mkChan();
 
+		$this->coll()->fibNum($ch, 1, 1);
+
+		$collected = [];
+		for ($i = 0; $i < $terms->get(); $i++) {
+			$collected[] = $ch->get();
+		}
+		return $collected;
+	}
+	public function fibNum(Chan $ch, $a, $b) {
+		$ch->add($a);
+		$this->coll()->fibNum($ch, $b, $a+$b);
+	}
 }
