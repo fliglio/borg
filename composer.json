@@ -30,7 +30,7 @@
     },
     "autoload": {
         "psr-0": {
-			"Fliglio\\Borg\\": ""
+			"Fliglio": "src/main/"
 		}
     },
     "autoload-dev": {

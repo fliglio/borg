@@ -46,8 +46,9 @@ component-test-setup:
 	@mkdir -p build/test/log
 	@docker run -t -d -p 80 -v $(CURDIR)/:/var/www/ -v $(CURDIR)/build/test/log/:/var/log/nginx/ -e "DOC_ROOT=/var/www/src/test/httpdocs/" --name $(NAME)-test $(LOCAL_DEV_IMAGE)
 	@sleep 5
-	docker run -v $(CURDIR)/:/var/www/ --link $(NAME)-test:consul $(LOCAL_DEV_IMAGE) /var/www/vendor/bin/chinchilla
-	sleep 5
+	@echo "Configuring chinchilla..."
+	@docker run -v $(CURDIR)/:/var/www/ --link $(NAME)-test:consul $(LOCAL_DEV_IMAGE) /var/www/vendor/bin/chinchilla
+	@sleep 5
 
 component-test-run:
 	docker run -v $(CURDIR)/:/var/www/ --link $(NAME)-test:localdev $(LOCAL_DEV_IMAGE) /var/www/vendor/bin/phpunit -c /var/www/phpunit.xml --testsuite component
