@@ -37,8 +37,18 @@ class ComponentTest extends \PHPUnit_Framework_TestCase {
 		// when
 		$resp = $this->client->get($this->add."/pi?terms=50");
 
-
 		// then
 		$this->assertEquals($expected, $resp->json(), '', 0.00001); // floating delta comparison
+	}
+	
+	public function testPrime() {
+		// given
+		$expected = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29];
+
+		// when
+		$resp = $this->client->get($this->add."/prime?limit=30");
+
+		// then
+		$this->assertEquals($expected, $resp->json());
 	}
 }

@@ -69,4 +69,39 @@ class TestResource {
 		$ch->add($term);
 	}
 
+	// find all prime numbers up to a limit
+	public function prime(GetParam $limit) {
+		$ch = $this->mkChan();
+		$ex = $this->mkChan();
+
+		for ($i = 2; $i < $limit->get(); $i++) {
+			$this->collectIfPrime($ch, $ex,  $i);
+		}
+
+		$primes = [];
+		$r = new ChanReader([$ch, $ex]);
+		$exits = 0;
+		while ($exits+2 < $limit->get()) {
+			list($id, $val) = $r->get();
+			switch ($id) {
+			case $ch->getId():
+				$primes[] = $val;
+			case $ex->getId():
+				$exits++;
+			}
+		}
+		return $primes;
+	}
+	public function collectIfPrime(Chan $ch, Chan $ex, $n) {
+		for ($i = 2; $i < $n; $i++) {
+			if ($n % $i == 0) {
+				$ex->add(true);
+				return;
+			}
+		}
+		
+		$ch->add($n);
+		$ex->add(true);
+	}
+
 }

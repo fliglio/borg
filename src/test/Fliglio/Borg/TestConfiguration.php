@@ -50,6 +50,11 @@ class TestConfiguration extends DefaultConfiguration {
 				->resource($resource, 'pi')
 				->method(Http::METHOD_GET)
 				->build(),
+			RouteBuilder::get()
+				->uri('/prime')
+				->resource($resource, 'prime')
+				->method(Http::METHOD_GET)
+				->build(),
 		
 			// Router for all Borg Collective calls
 			RouteBuilder::get()
