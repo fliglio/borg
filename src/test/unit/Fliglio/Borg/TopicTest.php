@@ -57,6 +57,35 @@ class TopicTest extends \PHPUnit_Framework_TestCase {
 		// then
 		$this->assertEquals($cfg, $cfg2, 'topic configs should match');
 	}
+	
+	/**
+	 * @expectedException \Exception
+	 */
+	public function testBadTopicComponentNs() {
+		// when
+		new TopicConfiguration('fo.o', 'bar', 'Fliglio\Borg\TopicTest', 'testTopic');
+	}
+	/**
+	 * @expectedException \Exception
+	 */
+	public function testBadTopicComponentDc() {
+		// when
+		new TopicConfiguration('foo', 'ba.r', 'Fliglio\Borg\TopicTest', 'testTopic');
+	}
+	/**
+	 * @expectedException \Exception
+	 */
+	public function testBadTopicComponentType() {
+		// when
+		new TopicConfiguration('foo', 'bar', 'Fliglio\Borg\Topic.Test', 'testTopic');
+	}
+	/**
+	 * @expectedException \Exception
+	 */
+	public function testBadTopicComponentMethod() {
+		// when
+		new TopicConfiguration('foo', 'bar', 'Fliglio\Borg\TopicTest', 'test.Topic');
+	}
 
 }
 

@@ -10,10 +10,17 @@ class TopicConfiguration {
 	private $method;
 
 	public function __construct($ns, $dc, $drone, $method) {
-		$this->ns = $ns;
-		$this->type = is_string($drone) ? $drone : get_class($drone);
-		$this->dc = $dc;
-		$this->method = $method;
+		$this->ns = $this->validate($ns);
+		$this->type = $this->validate(is_string($drone) ? $drone : get_class($drone));
+		$this->dc = $this->validate($dc);
+		$this->method = $this->validate($method);
+	}
+
+	private function validate($str) {
+		if (strpos($str, '.') !== false) {
+			throw new \Exception(sprintf("TopicConfiguration component cannot have '.': '%s'", $str));
+		}
+		return $str;
 	}
 
 	public function getNs() {
