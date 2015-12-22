@@ -24,7 +24,7 @@ class Collective {
 		$this->cubeDc = $cubeDc;
 		$this->defaultDc = $defaultDc;
 
-		$this->invoker = new CollectiveInvoker();
+		$this->invoker = new CollectiveInvoker($this->driver);
 	}
 
 	public function getDefaultDc() {
@@ -40,15 +40,6 @@ class Collective {
 	public function assimilate($i) {
 		$i->setCollective($this);
 		$this->drones[] = $i;
-	}
-
-	private function lookupDrone($type) {
-		foreach ($this->drones as $drone) {
-			if ($type == get_class($drone)) {
-				return $drone;
-			}
-		}
-		throw new \Exception("drone ".$type." not found");
 	}
 
 	/**
@@ -78,8 +69,18 @@ class Collective {
 
 		$topic = TopicConfiguration::fromTopicString($r->getHeader("X-routing-key"));
 		$inst = $this->lookupDrone($topic->getType());
+		$body = json_decode($r->getBody(), true);
 	
-		return $this->invoker->dispatchRequest($this->driver, $inst, $topic->getMethod(), json_decode($r->getBody(), true));
+		return $this->invoker->dispatchRequest($inst, $topic->getMethod(), $body);
+	}
+
+	private function lookupDrone($type) {
+		foreach ($this->drones as $drone) {
+			if ($type == get_class($drone)) {
+				return $drone;
+			}
+		}
+		throw new \Exception("drone ".$type." not found");
 	}
 
 }

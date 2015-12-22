@@ -19,7 +19,9 @@ class Chan {
 	public function __construct($type, CollectiveDriver $factory, $id = null) {
 		if (!is_null($type)) {
 			if (!in_array('Fliglio\Web\MappableApi', class_implements($type))) {
-				throw new \Exception(sprintf("Type '%s' doesn't implement MappableApi", $type));
+				if ('Fliglio\Borg\Chan\Chan' != $type) {
+					throw new \Exception(sprintf("Type '%s' isn't marshallable", $type));
+				}
 			}
 		}
 		$this->type = $type;

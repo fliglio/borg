@@ -63,7 +63,11 @@ class ArgParser {
 
 		// Chan
 		} else if ($type == Chan::CLASSNAME) {
-			return new Chan($arg["type"], $driver, $arg["id"]);
+			try {
+				return new Chan($arg["type"], $driver, $arg["id"]);
+			} catch (\Exception $e) {
+				throw new \Exception(print_r($arg, true));
+			}
 		}
 
 		throw new \Exception($type . " can't be unmarshalled");

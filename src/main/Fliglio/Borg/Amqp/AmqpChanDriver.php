@@ -67,7 +67,7 @@ class AmqpChanDriver implements ChanDriver {
 		}
 		$this->ch->basic_ack($msg->delivery_info['delivery_tag']);
 		
-		$data =  json_decode($msg->body);
+		$data =  json_decode($msg->body, true);
 		return $data;
 	}
 	/*

@@ -4,14 +4,20 @@ namespace Fliglio\Borg;
 
 class CollectiveInvoker {
 
+	private $driver;
 
-	public function dispatchRequest(CollectiveDriver $driver, $inst, $method, $body) {
+	public function __construct(CollectiveDriver $driver) {
+		$this->driver = $driver;
+	}
+
+
+	public function dispatchRequest($inst, $method, $body) {
 	
 
 		$rMethod = self::getReflectionMethod($inst, $method);
 		
 		$args = ArgParser::unmarshalArgs(
-			$driver,
+			$this->driver,
 			self::getTypesFromReflectionMethod($rMethod),
 			$body
 		);

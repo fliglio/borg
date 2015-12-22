@@ -38,7 +38,6 @@ class TopicConfiguration {
 
 
 	public static function fromTopicString($str) {
-		error_log("FROM STR: ".$str);
 		$parts = explode(".", $str);
 
 		$method = array_pop($parts);

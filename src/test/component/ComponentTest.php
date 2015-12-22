@@ -13,9 +13,12 @@ class ComponentTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	public function testBorg() {
-
 		$resp = $this->client->get($this->add."/test?msg=hello");
+		$this->assertEquals("hello world", $resp->json());
+	}
 
+	public function testChanChan() {
+		$resp = $this->client->get($this->add."/chan-chan?msg=hello");
 		$this->assertEquals("hello world", $resp->json());
 	}
 
