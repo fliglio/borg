@@ -16,34 +16,52 @@ class Chan {
 		
 		$this->driver = $factory->createChan($id);
 	}
+	/**
+	 * Get the Chan's type, all entities added to this chan must conform
+	 */
 	public function getType() {
 		return $this->mapper->getType();
 	}
+
+	/**
+	 * Unique Identifier for this chan across all services / processes
+	 */
 	public function getId() {
 		return $this->driver->getId();
 	}
 
+	/**
+	 * Add an entity to the Chan
+	 */
 	public function add($entity) {
 		$vo = $this->mapper->marshal($entity);
 		$this->driver->add($vo);
 	}
 
+	/**
+	 * Get an entity from the chan; block until one is ready
+	 */
 	public function get() {
 		$resp = $this->driver->get(false);
 		return $this->mapper->unmarshal($resp);
 	}
 
+	/**
+	 * Get an entity from the chan; if none available, return immediately.
+	 * Also return whether or not an entity was found with the entity
+	 * to allow for chans to return an actual "null" entity
+	 */
 	public function getnb() {
 		$resp = $this->driver->get(true);
 		if (is_null($resp)) {
-			return [null, null];
+			return [false, null];
 		}
-		return [
-			$this->getId(),
-			$this->mapper->unmarshal($resp),
-		];
+		return [true, $this->mapper->unmarshal($resp)];
 	}
 
+	/**
+	 * close connection to the Chan
+	 */
 	public function close() {
 		$this->driver->close();
 	}

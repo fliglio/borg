@@ -19,7 +19,12 @@ class CollectiveWrapper {
 	public function mkchan($type) {
 		return $this->collective->mkchan($type, $this->dc);
 	}
+	
 
+	/**
+	 * Using the magic __call method to capture the desired method to call, 
+	 * dispatch a Collective async routine request
+	 */
 	public function __call($method, array $args) {
 		$this->collective->dispatch($this->drone, $method, $args, $this->dc);
 	}

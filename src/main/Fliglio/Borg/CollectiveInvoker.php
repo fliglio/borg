@@ -11,6 +11,12 @@ class CollectiveInvoker {
 	}
 
 
+	/**
+	 * Make the collective async routine call on the specified drone
+	 *
+	 * Unmarshal an http request body into an array of args and call
+	 * the specified method on the specified drone with those args.
+	 */
 	public function dispatchRequest($inst, $method, $body) {
 		$rMethod = self::getReflectionMethod($inst, $method);
 		
