@@ -50,9 +50,53 @@ class InvokerTest extends \PHPUnit_Framework_TestCase {
 		// when
 		$resp = $invoker->dispatchRequest($this, 'myTestMethod', $vos);
 
-
 		// then
 		$this->assertEquals($args, $resp, 'Unmarshalled vos should match original entities');
 	}
 
+
+	/**
+	 * @expectedException \Exception
+	 */
+	public function testInvokeMethodBadTypes() {
+		// given
+		$invoker = new CollectiveInvoker($this->driver);
+		
+		$args = [$this->msg, $this->foo, $this->ch];
+
+		$vos = ArgParser::marshalArgs($args);
+
+		// when
+		$invoker->dispatchRequest($this, 'myTestMethod', $vos);
+	}
+	
+	/**
+	 * @expectedException \Exception
+	 */
+	public function testInvokeMethodTooFewArgs() {
+		// given
+		$invoker = new CollectiveInvoker($this->driver);
+		
+		$args = [$this->msg, $this->ch];
+
+		$vos = ArgParser::marshalArgs($args);
+
+		// when
+		$invoker->dispatchRequest($this, 'myTestMethod', $vos);
+	}
+
+	/**
+	 * @expectedException \Exception
+	 */
+	public function testInvokeMethodTooManyArgs() {
+		// given
+		$invoker = new CollectiveInvoker($this->driver);
+		
+		$args = [$this->msg, $this->ch, $this->foo, "extra"];
+
+		$vos = ArgParser::marshalArgs($args);
+
+		// when
+		$invoker->dispatchRequest($this, 'myTestMethod', $vos);
+	}
 }
