@@ -73,6 +73,7 @@ class InvokerTest extends \PHPUnit_Framework_TestCase {
 	/**
 	 * @expectedException \Exception
 	 */
+	/*
 	public function testInvokeMethodTooFewArgs() {
 		// given
 		$invoker = new CollectiveInvoker($this->driver);
@@ -84,7 +85,7 @@ class InvokerTest extends \PHPUnit_Framework_TestCase {
 		// when
 		$invoker->dispatchRequest($this, 'myTestMethod', $vos);
 	}
-
+	 */
 	/**
 	 * @expectedException \Exception
 	 */
