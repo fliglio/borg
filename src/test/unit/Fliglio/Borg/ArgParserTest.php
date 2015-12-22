@@ -2,6 +2,7 @@
 namespace Fliglio\Borg;
 
 use Fliglio\Borg\Chan\Chan;
+use Fliglio\Borg\Api\Foo;
 
 class ArgParserTest extends \PHPUnit_Framework_TestCase {
 	private $driver;
@@ -24,7 +25,6 @@ class ArgParserTest extends \PHPUnit_Framework_TestCase {
 
 				return $chanDriver;
 			}));
-		
 	}
 
 	public function testMarshalPrimitive() {
@@ -47,16 +47,65 @@ class ArgParserTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals($entities, $found, 'Unmarshalled vos should match original entities');
 	}
 
+	public function testMarshalMappableApi() {
+		// given
+		$entities = [
+			new Foo("foo"),
+			new Foo("bar"),
+		];
+		
+		$types = array_fill(0, count($entities), Foo::getClass());
+
+		// when
+		$vos = ArgParser::marshalArgs($entities);
+		
+		$found = ArgParser::unmarshalArgs($this->driver, $types, $vos);
+
+		// then
+		$this->assertEquals($entities, $found, 'Unmarshalled vos should match original entities');
+	}
+	
 	public function testMarshalChan() {
 		// given
 		$entities = [
 			new Chan(null, $this->driver),
-			new Chan(null, $this->driver, 'asdf1234'),
-			new Chan(Chan::CLASSNAME, $this->driver)
-			// add a mappableApi
+			new Chan(null, $this->driver, uniqid()),
+			new Chan(Chan::CLASSNAME, $this->driver),
+			new Chan(Chan::CLASSNAME, $this->driver, uniqid()),
+			new Chan(Foo::getClass(), $this->driver),
+			new Chan(Foo::getClass(), $this->driver, uniqid()),
 		];
 		
-		$types = array_fill(0, count($entities), 'Fliglio\Borg\Chan\Chan');
+		$types = array_fill(0, count($entities), Chan::CLASSNAME);
+
+		// when
+		$vos = ArgParser::marshalArgs($entities);
+		
+		$found = ArgParser::unmarshalArgs($this->driver, $types, $vos);
+
+		// then
+		$this->assertEquals($entities, $found, 'Unmarshalled vos should match original entities');
+	}
+	
+	public function testMarshalMix() {
+		// given
+		$entities = [
+			"asdf",
+			new Foo("foo"),
+			new Chan(Foo::getClass(), $this->driver),
+			false,
+			new Foo("bar"),
+			new Chan(null, $this->driver),
+		];
+		
+		$types = [
+			null,
+			Foo::getClass(),
+			Chan::CLASSNAME,
+			null,
+			Foo::getClass(),
+			Chan::CLASSNAME,
+		];
 
 		// when
 		$vos = ArgParser::marshalArgs($entities);
