@@ -74,6 +74,7 @@ class InvokerTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException \Exception
 	 */
 	/*
+	 this isn't working with php7, causes a fatal error instead of an exception
 	public function testInvokeMethodTooFewArgs() {
 		// given
 		$invoker = new CollectiveInvoker($this->driver);
