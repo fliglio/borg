@@ -12,8 +12,6 @@ class CollectiveInvoker {
 
 
 	public function dispatchRequest($inst, $method, $body) {
-	
-
 		$rMethod = self::getReflectionMethod($inst, $method);
 		
 		$args = ArgParser::unmarshalArgs(

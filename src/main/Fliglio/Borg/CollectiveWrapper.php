@@ -6,12 +6,12 @@ namespace Fliglio\Borg;
 class CollectiveWrapper {
 
 
-	private $collectiveAgent;
+	private $drone;
 	private $collective;
 	private $dc;
 
-	public function __construct($agent, Collective $c, $dc) {
-		$this->collectiveAgent = $agent;
+	public function __construct($drone, Collective $c, $dc) {
+		$this->drone = $drone;
 		$this->collective = $c;
 		$this->dc = $dc;
 	}
@@ -21,7 +21,7 @@ class CollectiveWrapper {
 	}
 
 	public function __call($method, array $args) {
-		$this->collective->dispatch($this->collectiveAgent, $method, $args, $this->dc);
+		$this->collective->dispatch($this->drone, $method, $args, $this->dc);
 	}
 }
 
