@@ -2,7 +2,7 @@
 
 namespace Fliglio\Borg;
 
-class Topic {
+class TopicConfiguration {
 
 	private $ns;
 	private $dc;
@@ -30,7 +30,7 @@ class Topic {
 	}
 
 
-	public static function fromString($str) {
+	public static function fromTopicString($str) {
 		error_log("FROM STR: ".$str);
 		$parts = explode(".", $str);
 
@@ -42,7 +42,7 @@ class Topic {
 		return new self($ns, $dc, $type, $method);
 	}
 
-	public function __toString() {
+	public function getTopicString() {
 	
 		$topicClass = str_replace("\\", ".", $this->type);
 		return $this->ns . '.' . $this->dc . '.' . $topicClass . '.' . $this->method;

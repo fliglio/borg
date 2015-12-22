@@ -64,8 +64,8 @@ class Collective {
 	public function dispatch($collectiveDrone, $method, array $args, $dc) {
 		$data = ArgParser::marshalArgs($args);
 		
-		$topic = new Topic($this->svcNs, $dc, $collectiveDrone, $method);
-		$this->driver->go((string)$topic, $data);
+		$topic = new TopicConfiguration($this->svcNs, $dc, $collectiveDrone, $method);
+		$this->driver->go($topic->getTopicString(), $data);
 	}
 
 	/**
@@ -76,7 +76,7 @@ class Collective {
 			throw new \Exception("x-routing-key not set");
 		}
 
-		$topic = Topic::fromString($r->getHeader("X-routing-key"));
+		$topic = TopicConfiguration::fromTopicString($r->getHeader("X-routing-key"));
 		$inst = $this->lookupDrone($topic->getType());
 	
 		return $this->invoker->dispatchRequest($this->driver, $inst, $topic->getMethod(), json_decode($r->getBody(), true));
