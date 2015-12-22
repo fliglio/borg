@@ -7,9 +7,6 @@ use Fliglio\Borg\CollectiveDriver;
 class Chan {
 	const CLASSNAME = __CLASS__;
 
-	private $id;
-	private $type; // chan type or null for primitive
-	private $factory;
 	private $driver;
 	
 	private $mapper;
@@ -17,19 +14,11 @@ class Chan {
 	public function __construct($type, CollectiveDriver $factory, $id = null) {
 		$this->mapper = new ChanTypeMapper($type, $factory);
 		
-		$this->type = $type;
-		$this->factory = $factory;
-
-		if (is_null($id)) {
-			$this->driver = $factory->createChan();
-		} else {
-			$this->driver = $factory->createChan($id);
-		}
+		$this->driver = $factory->createChan($id);
 	}
 	public function getType() {
-		return $this->type;
+		return $this->mapper->getType();
 	}
-
 	public function getId() {
 		return $this->driver->getId();
 	}
