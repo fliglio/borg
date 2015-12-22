@@ -69,24 +69,7 @@ class InvokerTest extends \PHPUnit_Framework_TestCase {
 		// when
 		$invoker->dispatchRequest($this, 'myTestMethod', $vos);
 	}
-	
-	/**
-	 * @expectedException \Exception
-	 */
-	/*
-	 this isn't working with php7, causes a fatal error instead of an exception
-	public function testInvokeMethodTooFewArgs() {
-		// given
-		$invoker = new CollectiveInvoker($this->driver);
-		
-		$args = [$this->msg, $this->ch];
 
-		$vos = ArgParser::marshalArgs($args);
-
-		// when
-		$invoker->dispatchRequest($this, 'myTestMethod', $vos);
-	}
-	 */
 	/**
 	 * @expectedException \Exception
 	 */
@@ -101,4 +84,20 @@ class InvokerTest extends \PHPUnit_Framework_TestCase {
 		// when
 		$invoker->dispatchRequest($this, 'myTestMethod', $vos);
 	}
+	
+	/*
+	 * expectedException \Exception
+	 this isn't working with php7, causes a fatal error instead of an exception
+	public function testInvokeMethodTooFewArgs() {
+		// given
+		$invoker = new CollectiveInvoker($this->driver);
+		
+		$args = [$this->msg, $this->ch];
+
+		$vos = ArgParser::marshalArgs($args);
+
+		// when
+		$invoker->dispatchRequest($this, 'myTestMethod', $vos);
+	}
+	 */
 }

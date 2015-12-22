@@ -76,7 +76,7 @@ class Collective {
 
 	private function lookupDrone($type) {
 		foreach ($this->drones as $drone) {
-			if ($type == get_class($drone)) {
+			if ($drone instanceof $type) {
 				return $drone;
 			}
 		}
