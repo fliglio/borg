@@ -16,11 +16,15 @@ class Collective {
 	private $cubeDc;
 	private $defaultDc;
 
+	private $invoker;
+
 	public function __construct(CollectiveDriver $driver, $svcNs, $cubeDc, $defaultDc = self::DEFAULT_DC) {
 		$this->driver = $driver;
 		$this->svcNs = $svcNs;
 		$this->cubeDc = $cubeDc;
 		$this->defaultDc = $defaultDc;
+
+		$this->invoker = new CollectiveInvoker();
 	}
 
 	public function getDefaultDc() {
@@ -38,9 +42,17 @@ class Collective {
 		$this->drones[] = $i;
 	}
 
+	private function lookupDrone($type) {
+		foreach ($this->drones as $drone) {
+			if ($type == get_class($drone)) {
+				return $drone;
+			}
+		}
+		throw new \Exception("drone ".$type." not found");
+	}
+
 	/**
 	 * Create a new Chan and return it
-	 * @todo impl az
 	 */
 	public function mkchan($type, $dc) {
 		return new Chan($type, $this->driver);
@@ -48,17 +60,13 @@ class Collective {
 
 	/**
 	 * Dispatch a new call
-	 * @todo impl az
 	 */
 	public function dispatch($collectiveDrone, $method, array $args, $dc) {
 		$data = ArgParser::marshalArgs($args);
-
-		$className = get_class($collectiveDrone);
-		$topicClass = str_replace("\\", ".", $className);
-		$topic = $this->svcNs . '.' . $dc . '.' . $topicClass . '.' . $method;
-		$this->driver->go($topic, $data);
+		
+		$topic = new Topic($this->svcNs, $dc, $collectiveDrone, $method);
+		$this->driver->go((string)$topic, $data);
 	}
-	
 
 	/**
 	 * Handle incoming request resulting from a `dispatch`
@@ -68,71 +76,10 @@ class Collective {
 			throw new \Exception("x-routing-key not set");
 		}
 
-		$topic = $r->getHeader("X-routing-key");
-
-		list($type, $method) = self::parseTopic($topic);
-
-		$inst = $this->lookupDrone($type);
-
-		$rMethod = self::getReflectionMethod($inst, $method);
-		
-		$args = ArgParser::unmarshalArgs(
-			$this->driver, 
-			self::getTypesFromReflectionMethod($rMethod),
-			json_decode($r->getBody(), true)
-		);
-
-		return $rMethod->invokeArgs($inst, $args);
+		$topic = Topic::fromString($r->getHeader("X-routing-key"));
+		$inst = $this->lookupDrone($topic->getType());
+	
+		return $this->invoker->dispatchRequest($this->driver, $inst, $topic->getMethod(), json_decode($r->getBody(), true));
 	}
 
-	private function parseTopic($topic) {
-		$parts = explode(".", $topic);
-
-		$method = array_pop($parts);
-		array_shift($parts);
-		array_shift($parts);
-		$type = implode("\\", $parts);
-
-		return [$type, $method];
-	}
-
-	private function lookupDrone($type) {
-		foreach ($this->drones as $drone) {
-			if ($type == get_class($drone)) {
-				return $drone;
-			}
-		}
-		throw new \Exception("drone ".$type."not found");
-	}
-
-	private static function getReflectionMethod($className, $methodName) {
-		try {
-			return new \ReflectionMethod($className, $methodName);
-		} catch (\ReflectionException $e) {
-			$rClass = new \ReflectionClass($className);
-			$parentRClass = $rClass->getParentClass();
-			if (!is_object($parentRClass)) {
-				throw new \Exception("Method '{$methodName}' does not exist");
-			}
-			$parentClassName = $parentRClass->getName();
-			return self::getReflectionMethod($parentClassName, $methodName);
-		}
-	}
-
-	private static function getTypesFromReflectionMethod(\ReflectionMethod $rMethod) {
-		$params = $rMethod->getParameters();
-
-		$types = [];
-		foreach ($params as $param) {
-			$cl = $param->getClass();
-			
-			if (is_null($cl)) {
-				$types[] = null;
-			} else {
-				$types[] = $cl->getName();
-			}
-		}
-
-		return $types;
-	}
 }
