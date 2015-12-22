@@ -21,9 +21,6 @@ class AmqpChanDriver implements ChanDriver {
 	public function __construct(AMQPStreamConnection $conn, $id = null) {
 		$this->conn = $conn;
 
-		//if (is_null($id)) {
-		//	$id = uniqid();
-		//}
 		$this->id = $id;
 
 		$this->queueName = $id;
@@ -42,11 +39,8 @@ class AmqpChanDriver implements ChanDriver {
 			'content_type' => 'application/json', 
 			'delivery_mode' => 2
 		));
-		//msg
-		//exchange
-		//routing_key
-		//mandatory
-		//immediate
+		
+		//msg, exchange, routing_key, mandatory, immediate
 		$this->ch->basic_publish($msg, $this->exchangeName, $this->queueName);
 	}
 
@@ -102,7 +96,7 @@ class AmqpChanDriver implements ChanDriver {
 		return $data;
 	}
 
-	// close & delete connection/queue
+	// close connection
 	public function close() {
 		$this->ch->close();
 	}
@@ -117,7 +111,6 @@ class AmqpChanDriver implements ChanDriver {
 		// auto_delete: false //the queue won't be deleted once the channel is closed.
 		// nowait: false
 		// args: null
-		//$ch->queue_declare($this->queueName, false, true, true, false);
 		if (is_null($this->queueName)) {
 			list($queueName, , ) = $ch->queue_declare(
 				"", false, false, false, 
@@ -128,6 +121,7 @@ class AmqpChanDriver implements ChanDriver {
 			$this->id = $queueName;
 		}
 		$ch->basic_qos(null, 1, null);
+		
 		// name: $exchange
 		// type: direct
 		// passive: false

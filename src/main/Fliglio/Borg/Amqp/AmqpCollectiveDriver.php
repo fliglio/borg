@@ -18,14 +18,18 @@ class AmqpCollectiveDriver implements CollectiveDriver {
 		$this->conn = $conn;
 	}
 	
+	/**
+	 * Factory method to create an AmqpChanDriver
+	 */
 	public function createChan($id = null) {
 		return new AmqpChanDriver($this->conn, $id);
 	}
 
 
-	// send message
+	/**
+	 *  Publish args with a routing_key containing routing details to exchange
+	 */
 	public function go($routingKey, array $data) {
-		error_log("routing_key: ".$routingKey);
 		
 		$ch = $this->getChannel();
 		
@@ -35,7 +39,9 @@ class AmqpCollectiveDriver implements CollectiveDriver {
 		$ch->basic_publish($msg, self::EXCHANGE, $routingKey);
 	}
 
-	// close & delete connection/queue
+	/**
+	 * close connection to rabbitmq channel
+	 */
 	public function close() {
 		$this->ch->close();
 	}
