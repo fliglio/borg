@@ -14,16 +14,10 @@ class ChanTypeMapperTest extends \PHPUnit_Framework_TestCase {
 			->getMock();
 		$this->driver->method('createChan')
 			->will($this->returnCallback(function($id = null) {
-				if (is_null($id)) {
-					$id = uniqid();
-				}
 				$chanDriver = $this->getMockBuilder('\Fliglio\Borg\Amqp\AmqpChanDriver')
 					->disableOriginalConstructor()
 					->getMock();
 		
-				$chanDriver->method('getId')
-					->willReturn($id);
-
 				return $chanDriver;
 			}));
 	}
