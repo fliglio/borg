@@ -4,10 +4,9 @@ namespace Fliglio\Borg;
 
 use Fliglio\Borg\Chan\Chan;
 use Fliglio\Borg\Type\Primitive;
+use Fliglio\Borg\Type\TypeUtil;
 
 class ArgParser {
-
-	const MAPPABLE_API_IFACE = 'Fliglio\Web\MappableApi';
 
 	public static function marshalArgs(array $args) {
 		$data = [];
@@ -25,7 +24,7 @@ class ArgParser {
 		}
 		
 		// object of type MappableApi
-		if (self::implementsMappableApi($arg)) {
+		if (TypeUtil::implementsMappableApi($arg)) {
 			return $arg->marshal();
 
 		// object of type Chan
@@ -58,7 +57,7 @@ class ArgParser {
 		}
 
 		// MappableApi
-		if (self::implementsMappableApi($type)) {
+		if (TypeUtil::implementsMappableApi($type)) {
 			return $type::unmarshal($arg);
 
 		// Chan
@@ -73,9 +72,5 @@ class ArgParser {
 		throw new \Exception($type . " can't be unmarshalled");
 	}
 
-	// $e is a class name or instance
-	private static function implementsMappableApi($e) {
-		return in_array(self::MAPPABLE_API_IFACE, class_implements($e));
-	}
 
 }

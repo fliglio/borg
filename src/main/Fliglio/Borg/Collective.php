@@ -53,10 +53,8 @@ class Collective {
 	 * Dispatch a new call
 	 */
 	public function dispatch($collectiveDrone, $method, array $args, $dc) {
-		$data = ArgParser::marshalArgs($args);
-		
 		$topic = new TopicConfiguration($this->svcNs, $dc, $collectiveDrone, $method);
-		$this->driver->go($topic->getTopicString(), $data);
+		$this->invoker->sendRequest($topic, $args);
 	}
 
 	/**
@@ -71,7 +69,7 @@ class Collective {
 		$inst = $this->lookupDrone($topic->getType());
 		$body = json_decode($r->getBody(), true);
 	
-		return $this->invoker->dispatchRequest($inst, $topic->getMethod(), $body);
+		return $this->invoker->handleRequest($inst, $topic->getMethod(), $body);
 	}
 
 	private function lookupDrone($type) {

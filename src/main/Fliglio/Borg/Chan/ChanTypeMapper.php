@@ -4,9 +4,9 @@ namespace Fliglio\Borg\Chan;
 
 use Fliglio\Web\MappableApi;
 
-use Fliglio\Borg\Type\Primitive;
 use Fliglio\Borg\CollectiveDriver;
 use Fliglio\Borg\ArgParser;
+use Fliglio\Borg\Type\TypeUtil;
 
 class ChanTypeMapper {
 
@@ -23,15 +23,10 @@ class ChanTypeMapper {
 	 *                  process persistence
 	 */
 	public function __construct($type, CollectiveDriver $factory) {
-		switch (true) {
-		case is_null($type):
-		case in_array('Fliglio\Web\MappableApi', class_implements($type)):
-		case $type == Chan::CLASSNAME:
-			$this->type = $type;
-			break;
-		default:
+		if (!TypeUtil::isMarshallableType($type)) {
 			throw new \Exception(sprintf("Type '%s' isn't marshallable", $type));
 		}
+		$this->type = $type;
 		
 		$this->factory = $factory;
 	}
@@ -41,11 +36,7 @@ class ChanTypeMapper {
 	}
 
 	public function marshal($entity) {
-		if (is_null($this->type)) {
-			if (is_object($entity)) {
-				throw new \Exception("This Chan expects a primitive");
-			}
-		} else if (!is_object($entity) || !is_a($entity, $this->type)) {
+		if (!TypeUtil::isA($entity, $this->type)) {
 			throw new \Exception(sprintf("This Chan expects a %s", $this->type));
 		}
 		return ArgParser::marshalArg($entity);

@@ -48,7 +48,7 @@ class InvokerTest extends \PHPUnit_Framework_TestCase {
 		$vos = ArgParser::marshalArgs($args);
 
 		// when
-		$resp = $invoker->dispatchRequest($this, 'myTestMethod', $vos);
+		$resp = $invoker->handleRequest($this, 'myTestMethod', $vos);
 
 		// then
 		$this->assertEquals($args, $resp, 'Unmarshalled vos should match original entities');
@@ -67,7 +67,7 @@ class InvokerTest extends \PHPUnit_Framework_TestCase {
 		$vos = ArgParser::marshalArgs($args);
 
 		// when
-		$invoker->dispatchRequest($this, 'myTestMethod', $vos);
+		$invoker->handleRequest($this, 'myTestMethod', $vos);
 	}
 
 	/**
@@ -82,7 +82,7 @@ class InvokerTest extends \PHPUnit_Framework_TestCase {
 		$vos = ArgParser::marshalArgs($args);
 
 		// when
-		$invoker->dispatchRequest($this, 'myTestMethod', $vos);
+		$invoker->handleRequest($this, 'myTestMethod', $vos);
 	}
 	
 	/*
