@@ -22,4 +22,14 @@ class ComponentTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals("hello world", $resp->json());
 	}
 
+	public function testGenerateNumbers() {
+		// given
+		$expected = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+		// when
+		$resp = $this->client->get($this->add."/generate-numbers?limit=10");
+	
+		// then
+		$this->assertEquals($expected, $resp->json());
+	}
 }

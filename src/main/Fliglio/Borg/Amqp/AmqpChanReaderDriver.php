@@ -16,8 +16,6 @@ class AmqpChanReaderDriver implements ChanReaderDriver {
 
 	/**
 	 * Find and return the next message from a collection of queues
-	 *
-	 * Return the id & resp for correlation
 	 */
 	public function get() {
 		while (true) {
@@ -25,7 +23,10 @@ class AmqpChanReaderDriver implements ChanReaderDriver {
 				$resp = $driver->nonBlockingGet();
 
 				if (!is_null($resp)) {
+					error_log("FOUND: ".$driver->getId());
 					return [$driver->getId(), $resp];
+				} else {
+					error_log("NOT FOUND: ".$driver->getId());
 				}
 			}
 			usleep(1000); // 1 millisecond

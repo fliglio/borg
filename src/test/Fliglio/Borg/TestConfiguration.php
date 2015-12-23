@@ -42,6 +42,11 @@ class TestConfiguration extends DefaultConfiguration {
 				->resource($resource, 'chanChan')
 				->method(Http::METHOD_GET)
 				->build(),
+			RouteBuilder::get()
+				->uri('/generate-numbers')
+				->resource($resource, 'generateNumbers')
+				->method(Http::METHOD_GET)
+				->build(),
 
 			RouteBuilder::get()
 				->uri('/fibonacci')

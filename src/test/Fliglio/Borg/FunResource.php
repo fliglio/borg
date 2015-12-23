@@ -70,8 +70,10 @@ class FunResource {
 			switch ($id) {
 			case $ch->getId():
 				$primes[] = $val;
+				break;
 			case $ex->getId():
 				$exits++;
+				break;
 			}
 		}
 		return $primes;
