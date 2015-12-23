@@ -2,8 +2,14 @@
 
 namespace Fliglio\Borg;
 
+use Fliglio\Borg\Driver\CollectiveDriver;
+use Fliglio\Borg\Driver\WireMapper;
+
 class ChanReader {
 
+	// Driver\ChanReaderDriver
+	private $driver;
+	private $mapper;
 	private $chans;
 
 	/**
@@ -13,7 +19,9 @@ class ChanReader {
 	 * and an entity from a chan early in the array will be returned until
 	 * it has none available.
 	 */
-	public function __construct(array $chans) {
+	public function __construct(CollectiveDriver $factory, WireMapper $mapper, array $chans) {
+		$this->driver = $factory->createChanReader($chans);
+		$this->mapper = $mapper;
 		$this->chans = $chans;
 	}
 
@@ -25,15 +33,17 @@ class ChanReader {
 	 * correlate the entity with which chan it came from.
 	 */
 	public function get() {
-		while (true) {
-			foreach ($this->chans as $chan) {
-				list($found, $entity) = $chan->getnb();
-				if ($found) {
-					return [$chan->getId(), $entity];
-				}
+		list($id, $resp) = $this->driver->get();
+		return [$id, $this->unmarshal($id, $resp)];
+	}
+	
+	private function unmarshal($id, $vo) {
+		foreach ($this->chans as $chan) {
+			if ($id == $chan->getId()) {
+				return $this->mapper->unmarshalArg($vo, $chan->getType());
 			}
-			usleep(1000); // 1 millisecond
 		}
+		throw new \Exception(sprintf("Chan id '%s' couldn't be found", $id));
 	}
 
 }

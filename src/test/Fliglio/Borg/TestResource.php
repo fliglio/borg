@@ -5,8 +5,6 @@ namespace Fliglio\Borg;
 use Fliglio\Web\GetParam;
 
 use Fliglio\Borg\BorgImplant;
-use Fliglio\Borg\Chan;
-use Fliglio\Borg\ChanReader;
 
 
 class TestResource {
@@ -91,9 +89,9 @@ class TestResource {
 		for ($i = 2; $i < $limit->get(); $i++) {
 			$this->collectIfPrime($ch, $ex,  $i);
 		}
-
 		$primes = [];
-		$r = new ChanReader([$ch, $ex]);
+
+		$r = $this->coll()->mkChanReader([$ch, $ex]);
 		$exits = 0;
 		while ($exits+2 < $limit->get()) {
 			list($id, $val) = $r->get();

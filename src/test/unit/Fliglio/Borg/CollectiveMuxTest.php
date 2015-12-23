@@ -10,7 +10,8 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 
 	private $driver;
 	private $mapper;
-
+	private $routing;
+		
 	public $msg;
 	public $ch;
 	public $foo;
@@ -34,6 +35,7 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 				return $chanDriver;
 			}));
 
+		$this->routing = new RoutingConfiguration("borg-demo");
 		$this->mapper = new DefaultMapper($this->driver);
 
 		$this->msg = "hello world";
@@ -54,7 +56,7 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 
 	public function testMux() {
 		// given
-		$coll = new Collective($this->driver, $this->mapper, "test", "default");
+		$coll = new Collective($this->driver, $this->mapper, $this->routing);
 		$coll->assimilate($this);
 		
 		$args = [$this->msg, $this->ch, $this->foo];
@@ -78,7 +80,7 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testMuxNoRoutingKey() {
 		// given
-		$coll = new Collective($this->driver, $this->mapper, "test", "default");
+		$coll = new Collective($this->driver, $this->mapper, $this->routing);
 		$coll->assimilate($this);
 		
 		$args = [$this->msg, $this->ch, $this->foo];
@@ -101,7 +103,7 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testMuxRoutingKeyBadDrone() {
 		// given
-		$coll = new Collective($this->driver, $this->mapper, "test", "default");
+		$coll = new Collective($this->driver, $this->mapper, $this->routing);
 		$coll->assimilate($this);
 		
 		$args = [$this->msg, $this->ch, $this->foo];
@@ -124,7 +126,7 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testMuxRoutingKeyBadMethod() {
 		// given
-		$coll = new Collective($this->driver, $this->mapper, "test", "default");
+		$coll = new Collective($this->driver, $this->mapper, $this->routing);
 		$coll->assimilate($this);
 		
 		$args = [$this->msg, $this->ch, $this->foo];

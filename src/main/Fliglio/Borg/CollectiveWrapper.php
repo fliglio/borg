@@ -17,9 +17,19 @@ class CollectiveWrapper {
 	}
 	
 	public function mkchan($type) {
-		return $this->collective->mkchan($type, $this->dc);
+		if ($this->dc != RoutingConfiguration::DEFAULT_ROUTING_KEY) {
+			throw new \Exception("Making Chans outside of your local datacenter isn't supported");
+		}
+		return $this->collective->mkchan($type);
 	}
-	
+
+	public function mkChanReader(array $chans) {
+		if ($this->dc != RoutingConfiguration::DEFAULT_ROUTING_KEY) {
+			throw new \Exception("Making ChanReaders outside of your local datacenter isn't supported");
+		}
+		return $this->collective->mkChanReader($chans);
+	}
+
 
 	/**
 	 * Using the magic __call method to capture the desired method to call, 

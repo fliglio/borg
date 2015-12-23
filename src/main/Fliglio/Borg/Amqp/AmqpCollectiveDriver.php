@@ -6,6 +6,7 @@ use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
 use Fliglio\Borg\Driver\CollectiveDriver;
+use Fliglio\Borg\Chan;
 
 class AmqpCollectiveDriver implements CollectiveDriver {
 
@@ -13,6 +14,8 @@ class AmqpCollectiveDriver implements CollectiveDriver {
 
 	private $conn;
 	private $ch;
+
+	private $chans = [];
 
 	public function __construct(AMQPStreamConnection $conn) {
 		$this->conn = $conn;
@@ -22,7 +25,16 @@ class AmqpCollectiveDriver implements CollectiveDriver {
 	 * Factory method to create an AmqpChanDriver
 	 */
 	public function createChan($id = null) {
-		return new AmqpChanDriver($this->conn, $id);
+		if (is_null($id) || !isset($this->chans[$id])) {
+			$chanDriver = new AmqpChanDriver($this->conn, $id);
+			$id = $chanDriver->getId();
+			$this->chans[$id] = $chanDriver;
+		}
+		return $this->chans[$id];
+	}
+
+	public function createChanReader(array $chans) {
+		return new AmqpChanReaderDriver($this, $chans);
 	}
 
 

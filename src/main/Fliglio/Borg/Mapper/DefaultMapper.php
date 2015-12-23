@@ -79,11 +79,7 @@ class DefaultMapper implements WireMapper {
 
 		// Chan
 		} else if ($type == Chan::CLASSNAME) {
-			try {
-				return new Chan($arg["type"], $this->driver, $this, $arg["id"]);
-			} catch (\Exception $e) {
-				throw new \Exception(print_r($arg, true));
-			}
+			return new Chan($arg["type"], $this->driver, $this, $arg["id"]);
 		}
 
 		throw new \Exception($type . " can't be unmarshalled");

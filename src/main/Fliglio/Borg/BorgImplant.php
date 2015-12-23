@@ -11,38 +11,39 @@ trait BorgImplant {
 	/**
 	 * run a routine in the master datacenter
 	 */
-	public function cube() {
-		return $this->az($this->collective->getCubeDc());
+	protected function master() {
+		return $this->az($this->collective->getMasterRoutingKey());
 	}
 
 	/**
-	 * run a routine in your current dataqcenter
+	 * run a routine in your current datacenter
 	 */
-	public function coll() {
-		return $this->az($this->collective->getDefaultDc());
+	protected function coll() {
+		return $this->az($this->collective->getLocalRoutingKey());
 	}
 
 	/**
 	 * Create a new Chan
 	 *
 	 * - only supported for local datacenter usage
-	 * - null type means "Primitive"
+	 * - null type means a primitive (e.g. scalar or array)
 	 */
 	protected function mkchan($type = null) {
 		return $this->coll()->mkchan($type);
 	}
 
-	private function az($name) {
-		if (!isset($this->availabilityZones[$name])) {
-			$this->availabilityZones[$name] = new CollectiveWrapper($this, $this->collective, $name);
-		}
-		return $this->availabilityZones[$name];
-	}
 	/**
 	 * Provide instance of collective to use
 	 * (set by the framework, don't use directly)
 	 */
 	public function setCollective(Collective $c) {
 		$this->collective = $c;
+	}
+	
+	private function az($name) {
+		if (!isset($this->availabilityZones[$name])) {
+			$this->availabilityZones[$name] = new CollectiveWrapper($this, $this->collective, $name);
+		}
+		return $this->availabilityZones[$name];
 	}
 }

@@ -8,31 +8,30 @@ use Fliglio\Borg\Driver\CollectiveDriver;
 use Fliglio\Borg\Driver\WireMapper;
 
 class Collective {
-	const DEFAULT_DC = "default";
+	private $driver;
+	private $mapper;
+	private $routing;
 
 	private $drones = [];
-	private $driver;
 
-	private $svcNs;
-	private $cubeDc;
-	private $defaultDc;
-
-	private $mapper;
-
-	public function __construct(CollectiveDriver $driver, WireMapper $mapper, $svcNs, $cubeDc, $defaultDc = self::DEFAULT_DC) {
+	public function __construct(CollectiveDriver $driver, WireMapper $mapper, RoutingConfiguration $routing) {
 		$this->driver = $driver;
-		$this->svcNs = $svcNs;
-		$this->cubeDc = $cubeDc;
-		$this->defaultDc = $defaultDc;
-		
 		$this->mapper = $mapper;
+		$this->routing = $routing;
 	}
 
-	public function getDefaultDc() {
-		return $this->defaultDc;
+	/**
+	 * Get routing_key component to route to datcenter this is running in
+	 */
+	public function getLocalRoutingKey() {
+		return $this->routing->getLocalRoutingKey();
 	}
-	public function getCubeDc() {
-		return $this->cubeDc;
+
+	/**
+	 * Get routing_key component to route to the master datcenter
+	 */
+	public function getMasterRoutingKey() {
+		return $this->routing->getMasterRoutingKey();
 	}
 
 	/**
@@ -46,22 +45,28 @@ class Collective {
 	/**
 	 * Create a new Chan and return it
 	 */
-	public function mkchan($type, $dc) {
+	public function mkchan($type) {
 		return new Chan($type, $this->driver, $this->mapper);
 	}
 
+	public function mkChanReader(array $chans) {
+		return new ChanReader($this->driver, $this->mapper, $chans);
+	}
+
 	/**
-	 * Dispatch a new call
+	 * Call a collective routine async
 	 */
 	public function dispatch($drone, $method, array $args, $dc) {
-		$topic = new TopicConfiguration($this->svcNs, $dc, $drone, $method);
+		$topic = new TopicConfiguration($this->routing->getNamespace(), $dc, $drone, $method);
 		$vos = $this->mapper->marshalForMethod($args, $drone, $method);
 	
 		$this->driver->go($topic->getTopicString(), $vos);
 	}
 
 	/**
-	 * Handle incoming request resulting from a `dispatch`
+	 * Handle a collective routing
+	 *
+	 * Process HTTP request resulting from a `dispatch`
 	 */
 	public function mux(RequestReader $r) {
 		if (!$r->isHeaderSet("X-routing-key")) {

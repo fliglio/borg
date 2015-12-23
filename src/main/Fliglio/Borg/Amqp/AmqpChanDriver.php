@@ -45,15 +45,7 @@ class AmqpChanDriver implements ChanDriver {
 	}
 
 	// return array, null for none found
-	public function get($noBlock=false) {
-		if ($noBlock) {
-			return $this->nonBlockingGet();
-		} else {
-			return $this->blockingGet();
-		}
-	}
-	
-	private function blockingGet() {
+	public function get() {
 		$msg = null;
 		while (is_null($msg)) {
 			$msg = $this->ch->basic_get($this->queueName);
@@ -85,7 +77,13 @@ class AmqpChanDriver implements ChanDriver {
 		return $this->msgCache;
 	}
 	 */
-	private function nonBlockingGet() {
+
+	/**
+	 * Get the next message or null of none available
+	 *
+	 * not part of the ChanDriver api, support method for AmqpChanReaderDriver
+	 */
+	public function nonBlockingGet() {
 		$msg = $this->ch->basic_get($this->queueName);
 		if (is_null($msg)) {
 			return null;

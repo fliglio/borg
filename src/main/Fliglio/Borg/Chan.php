@@ -47,21 +47,8 @@ class Chan {
 	 * Get an entity from the chan; block until one is ready
 	 */
 	public function get() {
-		$resp = $this->driver->get(false);
+		$resp = $this->driver->get();
 		return $this->mapper->unmarshalArg($resp, $this->type);
-	}
-
-	/**
-	 * Get an entity from the chan; if none available, return immediately.
-	 * Also return whether or not an entity was found with the entity
-	 * to allow for chans to return an actual "null" entity
-	 */
-	public function getnb() {
-		$resp = $this->driver->get(true);
-		if (is_null($resp)) {
-			return [false, null];
-		}
-		return [true, $this->mapper->unmarshalArg($resp, $this->type)];
 	}
 
 	/**
