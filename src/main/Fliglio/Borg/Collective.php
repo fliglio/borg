@@ -49,6 +49,9 @@ class Collective {
 		return new Chan($type, $this->driver, $this->mapper);
 	}
 
+	/**
+	 * Create a new reader to read from multiple chans
+	 */
 	public function mkChanReader(array $chans) {
 		return new ChanReader($this->driver, $this->mapper, $chans);
 	}

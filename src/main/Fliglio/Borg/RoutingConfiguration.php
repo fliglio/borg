@@ -2,6 +2,18 @@
 
 namespace Fliglio\Borg;
 
+/**
+ * Configuration for how Collective Routines are routed
+ *
+ * - namespace: namespace for messaging topic so that this services routines
+ *   don't get crossed with anothers
+ * - localRoutingKey: component for messaging topic to signal to route
+ *   Collective Routine requests to other instances of this service in the
+ *   current datacenter
+ * - masterRoutingKey: component for messaging topic to signal to route
+ *   CollectiveRoutine requests to instances of this service in the master
+ *   datacenter
+ */
 class RoutingConfiguration {
 	
 	const DEFAULT_ROUTING_KEY = 'default';

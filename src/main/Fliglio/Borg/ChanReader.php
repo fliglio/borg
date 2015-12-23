@@ -7,7 +7,6 @@ use Fliglio\Borg\Driver\WireMapper;
 
 class ChanReader {
 
-	// Driver\ChanReaderDriver
 	private $driver;
 	private $mapper;
 	private $chans;
@@ -24,7 +23,6 @@ class ChanReader {
 		$this->mapper = $mapper;
 		$this->chans = $chans;
 	}
-
 
 	/**
 	 * Get the next entity ready off a collection of Chans.
@@ -45,5 +43,4 @@ class ChanReader {
 		}
 		throw new \Exception(sprintf("Chan id '%s' couldn't be found", $id));
 	}
-
 }

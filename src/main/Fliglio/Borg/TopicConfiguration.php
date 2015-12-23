@@ -2,6 +2,10 @@
 
 namespace Fliglio\Borg;
 
+/**
+ * Configuration object to manage building a messaging topic
+ *
+ */
 class TopicConfiguration {
 
 	private $ns;
@@ -14,13 +18,6 @@ class TopicConfiguration {
 		$this->type = $this->validate(is_string($drone) ? $drone : get_class($drone));
 		$this->dc = $this->validate($dc);
 		$this->method = $this->validate($method);
-	}
-
-	private function validate($str) {
-		if (strpos($str, '.') !== false) {
-			throw new \Exception(sprintf("TopicConfiguration component cannot have '.': '%s'", $str));
-		}
-		return $str;
 	}
 
 	public function getNs() {
@@ -52,6 +49,13 @@ class TopicConfiguration {
 	
 		$topicClass = str_replace("\\", ".", $this->type);
 		return $this->ns . '.' . $this->dc . '.' . $topicClass . '.' . $this->method;
+	}
+
+	private function validate($str) {
+		if (strpos($str, '.') !== false) {
+			throw new \Exception(sprintf("TopicConfiguration component cannot have '.': '%s'", $str));
+		}
+		return $str;
 	}
 
 }

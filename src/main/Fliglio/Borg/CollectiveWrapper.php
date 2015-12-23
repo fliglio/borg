@@ -16,6 +16,9 @@ class CollectiveWrapper {
 		$this->dc = $dc;
 	}
 	
+	/**
+	 * Wrap chan factory and enforce only creating in local dc
+	 */
 	public function mkchan($type) {
 		if ($this->dc != RoutingConfiguration::DEFAULT_ROUTING_KEY) {
 			throw new \Exception("Making Chans outside of your local datacenter isn't supported");
@@ -23,6 +26,9 @@ class CollectiveWrapper {
 		return $this->collective->mkchan($type);
 	}
 
+	/**
+	 * Wrap chan reader factory and enforce only creating in local dc
+	 */
 	public function mkChanReader(array $chans) {
 		if ($this->dc != RoutingConfiguration::DEFAULT_ROUTING_KEY) {
 			throw new \Exception("Making ChanReaders outside of your local datacenter isn't supported");
@@ -32,8 +38,8 @@ class CollectiveWrapper {
 
 
 	/**
-	 * Using the magic __call method to capture the desired method to call, 
-	 * dispatch a Collective async routine request
+	 * Dispatch a Collective Routine async request
+	 * use the magic __call method to capture the desired method
 	 */
 	public function __call($method, array $args) {
 		$this->collective->dispatch($this->drone, $method, $args, $this->dc);

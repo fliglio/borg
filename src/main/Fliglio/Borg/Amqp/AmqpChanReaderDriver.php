@@ -9,7 +9,6 @@ class AmqpChanReaderDriver implements ChanReaderDriver {
 	private $drivers = [];
 
 	public function __construct(AmqpCollectiveDriver $factory, array $chans) {
-
 		foreach ($chans as $chan) {
 			$this->drivers[] = $factory->createChan($chan->getId());
 		}
