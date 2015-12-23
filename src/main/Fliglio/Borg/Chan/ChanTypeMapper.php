@@ -25,7 +25,6 @@ class ChanTypeMapper {
 	 */
 	public function __construct($type, CollectiveDriver $factory) {
 		$this->type = $type;
-		
 		$this->factory = $factory;
 	}
 
@@ -34,6 +33,6 @@ class ChanTypeMapper {
 	}
 
 	public function unmarshal($vo) {
-		return ArgMapper::unmarshalArg($this->factory, $this->type, $vo);
+		return ArgMapper::unmarshalArg($this->factory, $vo, $this->type);
 	}
 }

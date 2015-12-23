@@ -14,13 +14,10 @@ class CollectiveInvoker {
 	}
 
 	public function marshal($args, $inst, $method) {
-		$types = TypeUtil::getTypesForMethod($inst, $method);
-		return  ArgMapper::marshalArgs($args, $types);
+		return ArgMapper::marshalForMethod($args, $inst, $method);
 	}
 
 	public function unmarshal(array $vos, $inst, $method) {
-		$types = TypeUtil::getTypesForMethod($inst, $method);
-
-		return ArgMapper::unmarshalArgs($this->driver, $types, $vos);
+		return ArgMapper::unmarshalForMethod($this->driver, $vos, $inst, $method);
 	}
 }

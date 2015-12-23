@@ -5,6 +5,7 @@ namespace Fliglio\Borg;
 use Fliglio\Borg\Chan\Chan;
 
 use Fliglio\Http\RequestReader;
+use Fliglio\Borg\Type\ArgMapper;
 
 class Collective {
 	const DEFAULT_DC = "default";
@@ -16,15 +17,12 @@ class Collective {
 	private $cubeDc;
 	private $defaultDc;
 
-	private $invoker;
-
 	public function __construct(CollectiveDriver $driver, $svcNs, $cubeDc, $defaultDc = self::DEFAULT_DC) {
 		$this->driver = $driver;
 		$this->svcNs = $svcNs;
 		$this->cubeDc = $cubeDc;
 		$this->defaultDc = $defaultDc;
 
-		$this->invoker = new CollectiveInvoker($this->driver);
 	}
 
 	public function getDefaultDc() {
@@ -54,7 +52,7 @@ class Collective {
 	 */
 	public function dispatch($drone, $method, array $args, $dc) {
 		$topic = new TopicConfiguration($this->svcNs, $dc, $drone, $method);
-		$vos = $this->invoker->marshal($args, $drone, $method);
+		$vos = ArgMapper::marshalForMethod($args, $drone, $method);
 	
 		$this->driver->go($topic->getTopicString(), $vos);
 	}
@@ -71,7 +69,7 @@ class Collective {
 		$inst = $this->lookupDrone($topic->getType());
 		$vos = json_decode($r->getBody(), true);
 		
-		$entities = $this->invoker->unmarshal($vos, $inst, $topic->getMethod());
+		$entities = ArgMapper::unmarshalForMethod($this->driver, $vos, $inst, $topic->getMethod());
 		return call_user_func_array([$inst, $topic->getMethod()], $entities);
 	}
 

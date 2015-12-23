@@ -8,6 +8,11 @@ use Fliglio\Borg\Type\Primitive;
 
 class ArgMapper {
 
+	public static function marshalForMethod($args, $inst, $method) {
+		$types = TypeUtil::getTypesForMethod($inst, $method);
+		return  self::marshalArgs($args, $types);
+	}
+
 	public static function marshalArgs(array $args, array $types) {
 		$data = [];
 
@@ -17,6 +22,25 @@ class ArgMapper {
 			$data[] = self::marshalArg($arg, $type);
 		}
 		return $data;
+	}
+
+	public static function unmarshalForMethod(CollectiveDriver $driver, array $vos, $inst, $method) {
+		$types = TypeUtil::getTypesForMethod($inst, $method);
+
+		return self::unmarshalArgs($driver, $types, $vos);
+	}
+
+	public static function unmarshalArgs(CollectiveDriver $driver, array $types, array $args) {
+		if (count($types) < count($args)) {
+			throw new \Exception("too many args for method signature.");
+		}
+
+		$argEntities = [];
+		for ($i = 0; $i < count($args); $i++) {
+			$argEntities[] = self::unmarshalArg($driver, $args[$i], $types[$i]);
+		}
+
+		return $argEntities;
 	}
 
 	public static function marshalArg($arg, $type) {
@@ -43,21 +67,7 @@ class ArgMapper {
 		throw new \Exception(sprintf("arg '%s' can't be marshalled", print_r($arg, true)));
 	}
 
-
-	public static function unmarshalArgs(CollectiveDriver $driver, array $types, array $args) {
-		if (count($types) < count($args)) {
-			throw new \Exception("too many args for method signature.");
-		}
-
-		$argEntities = [];
-		for ($i = 0; $i < count($args); $i++) {
-			$argEntities[] = self::unmarshalArg($driver, $types[$i], $args[$i]);
-		}
-
-		return $argEntities;
-	}
-
-	public static function unmarshalArg(CollectiveDriver $driver, $type, $arg) {
+	public static function unmarshalArg(CollectiveDriver $driver, $arg, $type) {
 		// Primitive without a hint is expected
 		if (is_null($type)) {
 			$t = Primitive::getClass();

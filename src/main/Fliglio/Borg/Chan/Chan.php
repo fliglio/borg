@@ -3,17 +3,16 @@
 namespace Fliglio\Borg\Chan;
 
 use Fliglio\Borg\CollectiveDriver;
+use Fliglio\Borg\Type\ArgMapper;
 
 class Chan {
 	const CLASSNAME = __CLASS__;
 
+	private $factory;
 	private $driver;
 	
-	private $mapper;
-
 	public function __construct($type, CollectiveDriver $factory, $id = null) {
-		$this->mapper = new ChanTypeMapper($type, $factory);
-		
+		$this->factory = $factory;
 		$this->driver = $factory->createChan($id);
 		$this->type = $type;
 	}
@@ -35,7 +34,7 @@ class Chan {
 	 * Add an entity to the Chan
 	 */
 	public function add($entity) {
-		$vo = $this->mapper->marshal($entity);
+		$vo = ArgMapper::marshalArg($entity, $this->type);
 		$this->driver->add($vo);
 	}
 
@@ -44,7 +43,7 @@ class Chan {
 	 */
 	public function get() {
 		$resp = $this->driver->get(false);
-		return $this->mapper->unmarshal($resp);
+		return ArgMapper::unmarshalArg($this->factory, $resp, $this->type);
 	}
 
 	/**
@@ -57,7 +56,7 @@ class Chan {
 		if (is_null($resp)) {
 			return [false, null];
 		}
-		return [true, $this->mapper->unmarshal($resp)];
+		return [true, ArgMapper::unmarshalArg($this->factory, $resp, $this->type)];
 	}
 
 	/**
