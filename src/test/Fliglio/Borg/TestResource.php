@@ -5,8 +5,8 @@ namespace Fliglio\Borg;
 use Fliglio\Web\GetParam;
 
 use Fliglio\Borg\BorgImplant;
-use Fliglio\Borg\Chan\Chan;
-use Fliglio\Borg\Chan\ChanReader;
+use Fliglio\Borg\Chan;
+use Fliglio\Borg\ChanReader;
 
 
 class TestResource {

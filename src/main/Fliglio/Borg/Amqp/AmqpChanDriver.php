@@ -2,7 +2,7 @@
 
 namespace Fliglio\Borg\Amqp;
 
-use Fliglio\Borg\Chan\ChanDriver;
+use Fliglio\Borg\Driver\ChanDriver;
 
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;

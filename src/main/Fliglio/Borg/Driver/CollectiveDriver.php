@@ -1,6 +1,6 @@
 <?php
 
-namespace Fliglio\Borg;
+namespace Fliglio\Borg\Driver;
 
 /**
  * Interface for Collective async routines implementation

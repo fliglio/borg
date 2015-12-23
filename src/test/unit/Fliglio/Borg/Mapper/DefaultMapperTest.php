@@ -1,11 +1,12 @@
 <?php
-namespace Fliglio\Borg\Type;
+namespace Fliglio\Borg\Mapper;
 
-use Fliglio\Borg\Chan\Chan;
+use Fliglio\Borg\Chan;
 use Fliglio\Borg\Api\Foo;
 
-class ArgMapperTest extends \PHPUnit_Framework_TestCase {
+class DefaultMapperTest extends \PHPUnit_Framework_TestCase {
 	private $driver;
+	private $mapper;
 
 	public function setup() {
 		$this->driver = $this->getMockBuilder('\Fliglio\Borg\Amqp\AmqpCollectiveDriver')
@@ -25,6 +26,21 @@ class ArgMapperTest extends \PHPUnit_Framework_TestCase {
 
 				return $chanDriver;
 			}));
+		$this->mapper = new DefaultMapper($this->driver);
+	}
+	private function marshalArgs(array $args, array $types) {
+		$out = [];
+		for ($i = 0; $i < count($args); $i++) {
+			$out[] = $this->mapper->marshalArg($args[$i], $types[$i]);
+		}
+		return $out;
+	}
+	private function unmarshalArgs(array $args, array $types) {
+		$out = [];
+		for ($i = 0; $i < count($args); $i++) {
+			$out[] = $this->mapper->unmarshalArg($args[$i], $types[$i]);
+		}
+		return $out;
 	}
 
 	public function testMarshalPrimitive() {
@@ -39,9 +55,9 @@ class ArgMapperTest extends \PHPUnit_Framework_TestCase {
 		$types = array_fill(0, count($entities), null); // no hints are provided for primitives
 
 		// when
-		$vos = ArgMapper::marshalArgs($entities, $types);
+		$vos = $this->marshalArgs($entities, $types);
 		
-		$found = ArgMapper::unmarshalArgs($this->driver, $types, $vos);
+		$found = $this->unmarshalArgs($vos, $types);
 
 		// then
 		$this->assertEquals($entities, $found, 'Unmarshalled vos should match original entities');
@@ -57,9 +73,9 @@ class ArgMapperTest extends \PHPUnit_Framework_TestCase {
 		$types = array_fill(0, count($entities), Foo::getClass());
 
 		// when
-		$vos = ArgMapper::marshalArgs($entities, $types);
+		$vos = $this->marshalArgs($entities, $types);
 		
-		$found = ArgMapper::unmarshalArgs($this->driver, $types, $vos);
+		$found = $this->unmarshalArgs($vos, $types);
 
 		// then
 		$this->assertEquals($entities, $found, 'Unmarshalled vos should match original entities');
@@ -68,20 +84,20 @@ class ArgMapperTest extends \PHPUnit_Framework_TestCase {
 	public function testMarshalChan() {
 		// given
 		$entities = [
-			new Chan(null, $this->driver),
-			new Chan(null, $this->driver, uniqid()),
-			new Chan(Chan::CLASSNAME, $this->driver),
-			new Chan(Chan::CLASSNAME, $this->driver, uniqid()),
-			new Chan(Foo::getClass(), $this->driver),
-			new Chan(Foo::getClass(), $this->driver, uniqid()),
+			new Chan(null, $this->driver, $this->mapper),
+			new Chan(null, $this->driver, $this->mapper, uniqid()),
+			new Chan(Chan::CLASSNAME, $this->driver, $this->mapper),
+			new Chan(Chan::CLASSNAME, $this->driver, $this->mapper, uniqid()),
+			new Chan(Foo::getClass(), $this->driver, $this->mapper),
+			new Chan(Foo::getClass(), $this->driver, $this->mapper, uniqid()),
 		];
 		
 		$types = array_fill(0, count($entities), Chan::CLASSNAME);
 
 		// when
-		$vos = ArgMapper::marshalArgs($entities, $types);
+		$vos = $this->marshalArgs($entities, $types);
 		
-		$found = ArgMapper::unmarshalArgs($this->driver, $types, $vos);
+		$found = $this->unmarshalArgs($vos, $types);
 
 		// then
 		$this->assertEquals($entities, $found, 'Unmarshalled vos should match original entities');
@@ -92,10 +108,10 @@ class ArgMapperTest extends \PHPUnit_Framework_TestCase {
 		$entities = [
 			"asdf",
 			new Foo("foo"),
-			new Chan(Foo::getClass(), $this->driver),
+			new Chan(Foo::getClass(), $this->driver, $this->mapper),
 			false,
 			new Foo("bar"),
-			new Chan(null, $this->driver),
+			new Chan(null, $this->driver, $this->mapper),
 		];
 		
 		$types = [
@@ -108,9 +124,9 @@ class ArgMapperTest extends \PHPUnit_Framework_TestCase {
 		];
 
 		// when
-		$vos = ArgMapper::marshalArgs($entities, $types);
+		$vos = $this->marshalArgs($entities, $types);
 		
-		$found = ArgMapper::unmarshalArgs($this->driver, $types, $vos);
+		$found = $this->unmarshalArgs($vos, $types);
 
 		// then
 		$this->assertEquals($entities, $found, 'Unmarshalled vos should match original entities');

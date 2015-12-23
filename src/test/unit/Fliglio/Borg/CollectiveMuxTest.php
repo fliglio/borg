@@ -1,16 +1,15 @@
 <?php
 namespace Fliglio\Borg;
 
-use Fliglio\Borg\Chan\Chan;
 use Fliglio\Borg\Api\Foo;
 use Fliglio\Flfc\Request;
-use Fliglio\Borg\Type\ArgMapper;
-use FLiglio\Borg\Type\TypeUtil;
+use Fliglio\Borg\Mapper\DefaultMapper;
 
 class CollectiveMux extends \PHPUnit_Framework_TestCase {
 	use BorgImplant;
 
 	private $driver;
+	private $mapper;
 
 	public $msg;
 	public $ch;
@@ -35,9 +34,18 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 				return $chanDriver;
 			}));
 
+		$this->mapper = new DefaultMapper($this->driver);
+
 		$this->msg = "hello world";
-		$this->ch = new Chan(null, $this->driver);
+		$this->ch = new Chan(null, $this->driver, $this->mapper);
 		$this->foo = new Foo("bar");
+	}
+	private function marshalArgs(array $args, array $types) {
+		$out = [];
+		for ($i = 0; $i < count($args); $i++) {
+			$out[] = $this->mapper->marshalArg($args[$i], $types[$i]);
+		}
+		return $out;
 	}
 
 	public function myTestMethod($msg, Chan $ch, Foo $foo) {
@@ -46,11 +54,11 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 
 	public function testMux() {
 		// given
-		$coll = new Collective($this->driver, "test", "default");
+		$coll = new Collective($this->driver, $this->mapper, "test", "default");
 		$coll->assimilate($this);
 		
 		$args = [$this->msg, $this->ch, $this->foo];
-		$vos = ArgMapper::marshalArgs($args, TypeUtil::getTypesForMethod($this, 'myTestMethod'));
+		$vos = $this->mapper->marshalForMethod($args, $this, 'myTestMethod');
 		
 		$topic = new TopicConfiguration("test", "default", get_class($this), "myTestMethod");
 		
@@ -70,11 +78,11 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testMuxNoRoutingKey() {
 		// given
-		$coll = new Collective($this->driver, "test", "default");
+		$coll = new Collective($this->driver, $this->mapper, "test", "default");
 		$coll->assimilate($this);
 		
 		$args = [$this->msg, $this->ch, $this->foo];
-		$vos = ArgMapper::marshalArgs($args, TypeUtil::getTypesForMethod($this, 'myTestMethod'));
+		$vos = $this->mapper->marshalForMethod($args, $this, 'myTestMethod');
 		
 		$topic = new TopicConfiguration("test", "default", get_class($this), "myTestMethod");
 		
@@ -93,11 +101,11 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testMuxRoutingKeyBadDrone() {
 		// given
-		$coll = new Collective($this->driver, "test", "default");
+		$coll = new Collective($this->driver, $this->mapper, "test", "default");
 		$coll->assimilate($this);
 		
 		$args = [$this->msg, $this->ch, $this->foo];
-		$vos = ArgMapper::marshalArgs($args, TypeUtil::getTypesForMethod($this, 'myTestMethod'));
+		$vos = $this->mapper->marshalForMethod($args, $this, 'myTestMethod');
 		
 		$topic = new TopicConfiguration("test", "default", "what", "myTestMethod");
 		
@@ -116,11 +124,11 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testMuxRoutingKeyBadMethod() {
 		// given
-		$coll = new Collective($this->driver, "test", "default");
+		$coll = new Collective($this->driver, $this->mapper, "test", "default");
 		$coll->assimilate($this);
 		
 		$args = [$this->msg, $this->ch, $this->foo];
-		$vos = ArgMapper::marshalArgs($args, TypeUtil::getTypesForMethod($this, 'myTestMethod'));
+		$vos = $this->mapper->marshalForMethod($args, $this, 'myTestMethod');
 		
 		$topic = new TopicConfiguration("test", "default", get_class($this), "dne");
 		

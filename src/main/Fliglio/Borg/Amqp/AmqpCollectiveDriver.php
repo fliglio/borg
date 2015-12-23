@@ -5,7 +5,7 @@ namespace Fliglio\Borg\Amqp;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
-use Fliglio\Borg\CollectiveDriver;
+use Fliglio\Borg\Driver\CollectiveDriver;
 
 class AmqpCollectiveDriver implements CollectiveDriver {
 

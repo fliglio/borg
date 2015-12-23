@@ -1,11 +1,12 @@
 <?php
 namespace Fliglio\Borg;
 
-use Fliglio\Borg\Chan\Chan;
 use Fliglio\Borg\Api\Foo;
+use Fliglio\Borg\Mapper\DefaultMapper;
 
 class ChanTest extends \PHPUnit_Framework_TestCase {
 	private $driver;
+	private $mapper;
 
 	public static $q = [];
 
@@ -35,13 +36,14 @@ class ChanTest extends \PHPUnit_Framework_TestCase {
 
 				return $chanDriver;
 			}));
+		$this->mapper = new DefaultMapper($this->driver);
 	}
 
 
 	public function testChanPrimitive() {
 		// given
 		$entity = "Hello World";
-		$ch = new Chan(null, $this->driver);
+		$ch = new Chan(null, $this->driver, $this->mapper);
 
 		// when
 		$ch->add($entity);
@@ -54,7 +56,7 @@ class ChanTest extends \PHPUnit_Framework_TestCase {
 	public function testChanMappableApi() {
 		// given
 		$entity = new Foo("Hello World");
-		$ch = new Chan(Foo::getClass(), $this->driver);
+		$ch = new Chan(Foo::getClass(), $this->driver, $this->mapper);
 
 		// when
 		$ch->add($entity);
@@ -66,8 +68,8 @@ class ChanTest extends \PHPUnit_Framework_TestCase {
 
 	public function testChanChan() {
 		// given
-		$entity = new Chan(null, $this->driver);
-		$ch = new Chan(Chan::CLASSNAME, $this->driver);
+		$entity = new Chan(null, $this->driver, $this->mapper);
+		$ch = new Chan(Chan::CLASSNAME, $this->driver, $this->mapper);
 
 		// when
 		$ch->add($entity);
@@ -83,7 +85,7 @@ class ChanTest extends \PHPUnit_Framework_TestCase {
 	public function testChanUnmappableType() {
 		// given
 		$entity = new self();
-		$ch = new Chan(get_class($this), $this->driver);
+		$ch = new Chan(get_class($this), $this->driver, $this->mapper);
 
 		// when
 		$ch->add($entity);
@@ -95,7 +97,7 @@ class ChanTest extends \PHPUnit_Framework_TestCase {
 	public function testChanWrongType() {
 		// given
 		$entity = new Foo("Hello World");
-		$ch = new Chan(null, $this->driver);
+		$ch = new Chan(null, $this->driver, $this->mapper);
 
 		// when
 		$ch->add($entity);
@@ -107,7 +109,7 @@ class ChanTest extends \PHPUnit_Framework_TestCase {
 	public function testChanWrongType2() {
 		// given
 		$entity = "foo";
-		$ch = new Chan(Foo::getClass(), $this->driver);
+		$ch = new Chan(Foo::getClass(), $this->driver, $this->mapper);
 
 		// when
 		$ch->add($entity);

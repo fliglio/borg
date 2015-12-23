@@ -11,7 +11,7 @@ use GuzzleHttp\Client;
 use Fliglio\Borg\Amqp\AmqpCollectiveDriver;
 use Fliglio\Borg\Amqp\AmqpChanDriverFactory;
 use Fliglio\Borg\Collective;
-use Fliglio\Borg\Chan\ChanFactory;
+use Fliglio\Borg\Mapper\DefaultMapper;
 
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 
@@ -28,8 +28,8 @@ class TestConfiguration extends DefaultConfiguration {
 	
 		$resource = $this->getTestResource();
 		
-
-		$coll = new Collective($driver, "borg-demo", 'default');
+		$mapper = new DefaultMapper($driver);
+		$coll = new Collective($driver, $mapper, "borg-demo", 'default');
 		$coll->assimilate($resource);
 
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Fliglio\Borg\Chan;
+namespace Fliglio\Borg;
 
 class ChanReader {
 

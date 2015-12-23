@@ -1,20 +1,25 @@
 <?php
 
-namespace Fliglio\Borg\Chan;
+namespace Fliglio\Borg;
 
-use Fliglio\Borg\CollectiveDriver;
-use Fliglio\Borg\Type\ArgMapper;
+use Fliglio\Borg\Driver\CollectiveDriver;
+use Fliglio\Borg\Driver\WireMapper;
+
 
 class Chan {
 	const CLASSNAME = __CLASS__;
 
 	private $factory;
 	private $driver;
+
+	private $mapper;
 	
-	public function __construct($type, CollectiveDriver $factory, $id = null) {
+	public function __construct($type, CollectiveDriver $factory, WireMapper $mapper, $id = null) {
 		$this->factory = $factory;
 		$this->driver = $factory->createChan($id);
 		$this->type = $type;
+
+		$this->mapper = $mapper;
 	}
 	/**
 	 * Get the Chan's type, all entities added to this chan must conform
@@ -34,7 +39,7 @@ class Chan {
 	 * Add an entity to the Chan
 	 */
 	public function add($entity) {
-		$vo = ArgMapper::marshalArg($entity, $this->type);
+		$vo = $this->mapper->marshalArg($entity, $this->type);
 		$this->driver->add($vo);
 	}
 
@@ -43,7 +48,7 @@ class Chan {
 	 */
 	public function get() {
 		$resp = $this->driver->get(false);
-		return ArgMapper::unmarshalArg($this->factory, $resp, $this->type);
+		return $this->mapper->unmarshalArg($resp, $this->type);
 	}
 
 	/**
@@ -56,7 +61,7 @@ class Chan {
 		if (is_null($resp)) {
 			return [false, null];
 		}
-		return [true, ArgMapper::unmarshalArg($this->factory, $resp, $this->type)];
+		return [true, $this->mapper->unmarshalArg($resp, $this->type)];
 	}
 
 	/**

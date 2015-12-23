@@ -2,8 +2,6 @@
 
 namespace Fliglio\Borg;
 
-use Fliglio\Borg\Chan\ChanFactory;
-
 trait BorgImplant {
 	
 	private $collective;

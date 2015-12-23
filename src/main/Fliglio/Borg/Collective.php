@@ -2,10 +2,10 @@
 
 namespace Fliglio\Borg;
 
-use Fliglio\Borg\Chan\Chan;
-
 use Fliglio\Http\RequestReader;
 use Fliglio\Borg\Type\ArgMapper;
+use Fliglio\Borg\Driver\CollectiveDriver;
+use Fliglio\Borg\Driver\WireMapper;
 
 class Collective {
 	const DEFAULT_DC = "default";
@@ -17,12 +17,15 @@ class Collective {
 	private $cubeDc;
 	private $defaultDc;
 
-	public function __construct(CollectiveDriver $driver, $svcNs, $cubeDc, $defaultDc = self::DEFAULT_DC) {
+	private $mapper;
+
+	public function __construct(CollectiveDriver $driver, WireMapper $mapper, $svcNs, $cubeDc, $defaultDc = self::DEFAULT_DC) {
 		$this->driver = $driver;
 		$this->svcNs = $svcNs;
 		$this->cubeDc = $cubeDc;
 		$this->defaultDc = $defaultDc;
-
+		
+		$this->mapper = $mapper;
 	}
 
 	public function getDefaultDc() {
@@ -44,7 +47,7 @@ class Collective {
 	 * Create a new Chan and return it
 	 */
 	public function mkchan($type, $dc) {
-		return new Chan($type, $this->driver);
+		return new Chan($type, $this->driver, $this->mapper);
 	}
 
 	/**
@@ -52,7 +55,7 @@ class Collective {
 	 */
 	public function dispatch($drone, $method, array $args, $dc) {
 		$topic = new TopicConfiguration($this->svcNs, $dc, $drone, $method);
-		$vos = ArgMapper::marshalForMethod($args, $drone, $method);
+		$vos = $this->mapper->marshalForMethod($args, $drone, $method);
 	
 		$this->driver->go($topic->getTopicString(), $vos);
 	}
@@ -69,7 +72,7 @@ class Collective {
 		$inst = $this->lookupDrone($topic->getType());
 		$vos = json_decode($r->getBody(), true);
 		
-		$entities = ArgMapper::unmarshalForMethod($this->driver, $vos, $inst, $topic->getMethod());
+		$entities = $this->mapper->unmarshalForMethod($vos, $inst, $topic->getMethod());
 		return call_user_func_array([$inst, $topic->getMethod()], $entities);
 	}
 

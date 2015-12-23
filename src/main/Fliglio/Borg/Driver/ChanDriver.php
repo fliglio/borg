@@ -1,6 +1,6 @@
 <?php
 
-namespace Fliglio\Borg\Chan;
+namespace Fliglio\Borg\Driver;
 
 /**
  * Interface for Chan persistence implementation
