@@ -76,5 +76,41 @@ class ChanTest extends \PHPUnit_Framework_TestCase {
 		// then
 		$this->assertEquals($entity, $found, 'chan get should return same entity that was added');
 	}
+
+	/**
+	 * @expectedException \Exception
+	 */
+	public function testChanUnmappableType() {
+		// given
+		$entity = new self();
+		$ch = new Chan(get_class($this), $this->driver);
+
+		// when
+		$ch->add($entity);
+	}
+
+	/**
+	 * @expectedException \Exception
+	 */
+	public function testChanWrongType() {
+		// given
+		$entity = new Foo("Hello World");
+		$ch = new Chan(null, $this->driver);
+
+		// when
+		$ch->add($entity);
+	}
+
+	/**
+	 * @expectedException \Exception
+	 */
+	public function testChanWrongType2() {
+		// given
+		$entity = "foo";
+		$ch = new Chan(Foo::getClass(), $this->driver);
+
+		// when
+		$ch->add($entity);
+	}
 }
 
