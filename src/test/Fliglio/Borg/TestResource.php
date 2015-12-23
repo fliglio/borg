@@ -5,7 +5,6 @@ namespace Fliglio\Borg;
 use Fliglio\Web\GetParam;
 
 use Fliglio\Borg\BorgImplant;
-use Fliglio\Borg\Type\Primitive;
 use Fliglio\Borg\Chan\Chan;
 use Fliglio\Borg\Chan\ChanReader;
 

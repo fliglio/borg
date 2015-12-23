@@ -4,7 +4,6 @@ namespace Fliglio\Borg\Type;
 
 use Fliglio\Borg\CollectiveDriver;
 use Fliglio\Borg\Chan\Chan;
-use Fliglio\Borg\Type\Primitive;
 
 class ArgMapper {
 
@@ -53,7 +52,7 @@ class ArgMapper {
 
 		// wrap primitive
 		if (!is_object($arg)) {
-			$arg = new Primitive($arg);
+			return $arg;
 		}
 		
 		// object of type MappableApi
@@ -70,9 +69,7 @@ class ArgMapper {
 	public static function unmarshalArg(CollectiveDriver $driver, $arg, $type) {
 		// Primitive without a hint is expected
 		if (is_null($type)) {
-			$t = Primitive::getClass();
-			$p = $t::unmarshal($arg);
-			return $p->value();
+			return $arg;
 		}
 
 		// MappableApi
