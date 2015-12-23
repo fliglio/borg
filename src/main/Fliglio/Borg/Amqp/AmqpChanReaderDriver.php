@@ -16,10 +16,9 @@ class AmqpChanReaderDriver implements ChanReaderDriver {
 	}
 
 	/**
-	 * Get the next entity ready off a collection of Chans.
+	 * Find and return the next message from a collection of queues
 	 *
-	 * The Chan's `id` will be returned with the entity to help client code
-	 * correlate the entity with which chan it came from.
+	 * Return the id & resp for correlation
 	 */
 	public function get() {
 		while (true) {

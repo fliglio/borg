@@ -9,17 +9,16 @@ use Fliglio\Borg\Driver\WireMapper;
 class Chan {
 	const CLASSNAME = __CLASS__;
 
-	private $factory;
-	private $driver;
-
 	private $mapper;
+	private $driver;
+	
+	private $type;
 	
 	public function __construct($type, CollectiveDriver $factory, WireMapper $mapper, $id = null) {
-		$this->factory = $factory;
-		$this->driver = $factory->createChan($id);
 		$this->type = $type;
-
 		$this->mapper = $mapper;
+		$this->driver = $factory->createChan($id);
+
 	}
 	/**
 	 * Get the Chan's type, all entities added to this chan must conform

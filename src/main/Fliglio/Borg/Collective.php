@@ -3,7 +3,7 @@
 namespace Fliglio\Borg;
 
 use Fliglio\Http\RequestReader;
-use Fliglio\Borg\Type\ArgMapper;
+
 use Fliglio\Borg\Driver\CollectiveDriver;
 use Fliglio\Borg\Driver\WireMapper;
 
@@ -39,7 +39,7 @@ class Collective {
 	 */
 	public function assimilate($i) {
 		$i->setCollective($this);
-		$this->drones[] = $i;
+		$this->drones[get_class($i)] = $i;
 	}
 
 	/**
@@ -69,25 +69,27 @@ class Collective {
 	 * Process HTTP request resulting from a `dispatch`
 	 */
 	public function mux(RequestReader $r) {
+		$topic = $this->buildTopic($r);
+		$inst = $this->lookupDrone($topic->getType());
+		$method = $topic->getMethod();
+		$vos = json_decode($r->getBody(), true);
+		
+		$entities = $this->mapper->unmarshalForMethod($vos, $inst, $method);
+		return call_user_func_array([$inst, $method], $entities);
+	}
+
+	private function buildTopic(RequestReader $r) {
 		if (!$r->isHeaderSet("X-routing-key")) {
 			throw new \Exception("x-routing-key not set");
 		}
-
-		$topic = TopicConfiguration::fromTopicString($r->getHeader("X-routing-key"));
-		$inst = $this->lookupDrone($topic->getType());
-		$vos = json_decode($r->getBody(), true);
-		
-		$entities = $this->mapper->unmarshalForMethod($vos, $inst, $topic->getMethod());
-		return call_user_func_array([$inst, $topic->getMethod()], $entities);
+		return TopicConfiguration::fromTopicString($r->getHeader("X-routing-key"));
 	}
 
 	private function lookupDrone($type) {
-		foreach ($this->drones as $drone) {
-			if ($drone instanceof $type) {
-				return $drone;
-			}
+		if (!isset($this->drones[$type])) {
+			throw new \Exception("drone ".$type." not found");
 		}
-		throw new \Exception("drone ".$type." not found");
+		return $this->drones[$type];
 	}
 
 }
