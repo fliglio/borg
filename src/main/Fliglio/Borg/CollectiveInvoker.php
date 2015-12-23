@@ -23,17 +23,4 @@ class CollectiveInvoker {
 
 		return ArgMapper::unmarshalArgs($this->driver, $types, $vos);
 	}
-	/**
-	 * Make the collective async routine call on the specified drone
-	 *
-	 * Unmarshal an http request body into an array of args and call
-	 * the specified method on the specified drone with those args.
-	 */
-	public function handleRequest($inst, $method, array $vos) {
-		$types = TypeUtil::getTypesForMethod($inst, $method);
-
-		$entities = ArgMapper::unmarshalArgs($this->driver, $types, $vos);
-	
-		return call_user_func_array([$inst, $method], $entities);
-	}
 }

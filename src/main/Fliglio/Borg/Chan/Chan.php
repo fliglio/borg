@@ -15,12 +15,13 @@ class Chan {
 		$this->mapper = new ChanTypeMapper($type, $factory);
 		
 		$this->driver = $factory->createChan($id);
+		$this->type = $type;
 	}
 	/**
 	 * Get the Chan's type, all entities added to this chan must conform
 	 */
 	public function getType() {
-		return $this->mapper->getType();
+		return $this->type;
 	}
 
 	/**

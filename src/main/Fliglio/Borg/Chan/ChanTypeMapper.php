@@ -29,10 +29,6 @@ class ChanTypeMapper {
 		$this->factory = $factory;
 	}
 
-	public function getType() {
-		return $this->type;
-	}
-
 	public function marshal($entity) {
 		return ArgMapper::marshalArg($entity, $this->type);
 	}

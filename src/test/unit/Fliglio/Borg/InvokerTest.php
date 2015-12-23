@@ -49,7 +49,7 @@ class InvokerTest extends \PHPUnit_Framework_TestCase {
 		$vos = ArgMapper::marshalArgs($args, TypeUtil::getTypesForMethod($this, 'myTestMethod'));
 
 		// when
-		$resp = $invoker->handleRequest($this, 'myTestMethod', $vos);
+		$resp = $invoker->unmarshal($vos,  $this, 'myTestMethod');
 
 		// then
 		$this->assertEquals($args, $resp, 'Unmarshalled vos should match original entities');
@@ -68,7 +68,7 @@ class InvokerTest extends \PHPUnit_Framework_TestCase {
 		$vos = ArgMapper::marshalArgs($args, TypeUtil::getTypesForMethod($this, 'myTestMethod'));
 
 		// when
-		$invoker->handleRequest($this, 'myTestMethod', $vos);
+		$invoker->unmarshal($vos,  $this, 'myTestMethod');
 	}
 
 	/**
@@ -82,7 +82,7 @@ class InvokerTest extends \PHPUnit_Framework_TestCase {
 		$vos = ArgMapper::marshalArgs($args, TypeUtil::getTypesForMethod($this, 'myTestMethod'));
 
 		// when
-		$invoker->handleRequest($this, 'myTestMethod', $vos);
+		$invoker->unmarshal($vos,  $this, 'myTestMethod');
 	}
 	
 	/*
@@ -97,7 +97,7 @@ class InvokerTest extends \PHPUnit_Framework_TestCase {
 		$vos = ArgMapper::marshalArgs($args);
 
 		// when
-		$invoker->dispatchRequest($this, 'myTestMethod', $vos);
+		$invoker->unmarshal($vos,  $this, 'myTestMethod');
 	}
 	 */
 }
