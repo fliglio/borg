@@ -23,10 +23,7 @@ class AmqpChanReaderDriver implements ChanReaderDriver {
 				$resp = $driver->nonBlockingGet();
 
 				if (!is_null($resp)) {
-					error_log("FOUND: ".$driver->getId());
 					return [$driver->getId(), $resp];
-				} else {
-					error_log("NOT FOUND: ".$driver->getId());
 				}
 			}
 			usleep(1000); // 1 millisecond

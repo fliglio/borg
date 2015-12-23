@@ -66,10 +66,8 @@ class TestResource {
 	public function gen(Chan $ch, Chan $ex, $limit) {
 		for ($i = 0; $i <= $limit; $i++) {
 			$ch->add($i);
-			error_log($i);
 		}
 
 		$ex->add(true);
-		error_log("done");
 	}
 }
