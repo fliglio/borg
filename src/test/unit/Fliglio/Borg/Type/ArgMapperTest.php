@@ -1,5 +1,5 @@
 <?php
-namespace Fliglio\Borg;
+namespace Fliglio\Borg\Type;
 
 use Fliglio\Borg\Chan\Chan;
 use Fliglio\Borg\Api\Foo;
@@ -39,9 +39,9 @@ class ArgParserTest extends \PHPUnit_Framework_TestCase {
 		$types = array_fill(0, count($entities), null); // no hints are provided for primitives
 
 		// when
-		$vos = ArgParser::marshalArgs($entities);
+		$vos = ArgMapper::marshalArgs($entities);
 		
-		$found = ArgParser::unmarshalArgs($this->driver, $types, $vos);
+		$found = ArgMapper::unmarshalArgs($this->driver, $types, $vos);
 
 		// then
 		$this->assertEquals($entities, $found, 'Unmarshalled vos should match original entities');
@@ -57,9 +57,9 @@ class ArgParserTest extends \PHPUnit_Framework_TestCase {
 		$types = array_fill(0, count($entities), Foo::getClass());
 
 		// when
-		$vos = ArgParser::marshalArgs($entities);
+		$vos = ArgMapper::marshalArgs($entities);
 		
-		$found = ArgParser::unmarshalArgs($this->driver, $types, $vos);
+		$found = ArgMapper::unmarshalArgs($this->driver, $types, $vos);
 
 		// then
 		$this->assertEquals($entities, $found, 'Unmarshalled vos should match original entities');
@@ -79,9 +79,9 @@ class ArgParserTest extends \PHPUnit_Framework_TestCase {
 		$types = array_fill(0, count($entities), Chan::CLASSNAME);
 
 		// when
-		$vos = ArgParser::marshalArgs($entities);
+		$vos = ArgMapper::marshalArgs($entities);
 		
-		$found = ArgParser::unmarshalArgs($this->driver, $types, $vos);
+		$found = ArgMapper::unmarshalArgs($this->driver, $types, $vos);
 
 		// then
 		$this->assertEquals($entities, $found, 'Unmarshalled vos should match original entities');
@@ -108,9 +108,9 @@ class ArgParserTest extends \PHPUnit_Framework_TestCase {
 		];
 
 		// when
-		$vos = ArgParser::marshalArgs($entities);
+		$vos = ArgMapper::marshalArgs($entities);
 		
-		$found = ArgParser::unmarshalArgs($this->driver, $types, $vos);
+		$found = ArgMapper::unmarshalArgs($this->driver, $types, $vos);
 
 		// then
 		$this->assertEquals($entities, $found, 'Unmarshalled vos should match original entities');

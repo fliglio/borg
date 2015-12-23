@@ -1,12 +1,12 @@
 <?php
 
-namespace Fliglio\Borg;
+namespace Fliglio\Borg\Type;
 
+use Fliglio\Borg\CollectiveDriver;
 use Fliglio\Borg\Chan\Chan;
 use Fliglio\Borg\Type\Primitive;
-use Fliglio\Borg\Type\TypeUtil;
 
-class ArgParser {
+class ArgMapper {
 
 	public static function marshalArgs(array $args) {
 		$data = [];

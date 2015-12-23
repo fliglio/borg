@@ -4,6 +4,8 @@ namespace Fliglio\Borg;
 use Fliglio\Borg\Chan\Chan;
 use Fliglio\Borg\Api\Foo;
 use Fliglio\Flfc\Request;
+use Fliglio\Borg\Type\ArgMapper;
+
 
 class CollectiveMux extends \PHPUnit_Framework_TestCase {
 	use BorgImplant;
@@ -48,7 +50,7 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 		$coll->assimilate($this);
 		
 		$args = [$this->msg, $this->ch, $this->foo];
-		$vos = ArgParser::marshalArgs($args);
+		$vos = ArgMapper::marshalArgs($args);
 		
 		$topic = new TopicConfiguration("test", "default", get_class($this), "myTestMethod");
 		
@@ -72,7 +74,7 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 		$coll->assimilate($this);
 		
 		$args = [$this->msg, $this->ch, $this->foo];
-		$vos = ArgParser::marshalArgs($args);
+		$vos = ArgMapper::marshalArgs($args);
 		
 		$topic = new TopicConfiguration("test", "default", get_class($this), "myTestMethod");
 		
@@ -95,7 +97,7 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 		$coll->assimilate($this);
 		
 		$args = [$this->msg, $this->ch, $this->foo];
-		$vos = ArgParser::marshalArgs($args);
+		$vos = ArgMapper::marshalArgs($args);
 		
 		$topic = new TopicConfiguration("test", "default", "what", "myTestMethod");
 		
@@ -118,7 +120,7 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 		$coll->assimilate($this);
 		
 		$args = [$this->msg, $this->ch, $this->foo];
-		$vos = ArgParser::marshalArgs($args);
+		$vos = ArgMapper::marshalArgs($args);
 		
 		$topic = new TopicConfiguration("test", "default", get_class($this), "dne");
 		

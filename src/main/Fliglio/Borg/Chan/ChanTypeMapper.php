@@ -7,6 +7,7 @@ use Fliglio\Web\MappableApi;
 use Fliglio\Borg\CollectiveDriver;
 use Fliglio\Borg\ArgParser;
 use Fliglio\Borg\Type\TypeUtil;
+use Fliglio\Borg\Type\ArgMapper;
 
 class ChanTypeMapper {
 
@@ -39,10 +40,10 @@ class ChanTypeMapper {
 		if (!TypeUtil::isA($entity, $this->type)) {
 			throw new \Exception(sprintf("This Chan expects a %s", $this->type));
 		}
-		return ArgParser::marshalArg($entity);
+		return ArgMapper::marshalArg($entity);
 	}
 
 	public function unmarshal($vo) {
-		return ArgParser::unmarshalArg($this->factory, $this->type, $vo);
+		return ArgMapper::unmarshalArg($this->factory, $this->type, $vo);
 	}
 }

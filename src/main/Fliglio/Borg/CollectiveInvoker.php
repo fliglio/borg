@@ -3,6 +3,7 @@
 namespace Fliglio\Borg;
 
 use Fliglio\Borg\Type\TypeUtil;
+use Fliglio\Borg\Type\ArgMapper;
 
 class CollectiveInvoker {
 
@@ -13,7 +14,7 @@ class CollectiveInvoker {
 	}
 
 	public function sendRequest($topic, $args) {
-		$data = ArgParser::marshalArgs($args);
+		$data = ArgMapper::marshalArgs($args);
 		$this->driver->go($topic->getTopicString(), $data);
 	}
 
@@ -23,12 +24,12 @@ class CollectiveInvoker {
 	 * Unmarshal an http request body into an array of args and call
 	 * the specified method on the specified drone with those args.
 	 */
-	public function handleRequest($inst, $method, $body) {
+	public function handleRequest($inst, $method, array $vos) {
 		
-		$args = ArgParser::unmarshalArgs(
+		$args = ArgMapper::unmarshalArgs(
 			$this->driver,
 			TypeUtil::getTypesForMethod($inst, $method),
-			$body
+			$vos
 		);
 	
 		return call_user_func_array([$inst, $method], $args);

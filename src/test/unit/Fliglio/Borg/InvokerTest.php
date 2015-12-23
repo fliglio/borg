@@ -3,6 +3,7 @@ namespace Fliglio\Borg;
 
 use Fliglio\Borg\Chan\Chan;
 use Fliglio\Borg\Api\Foo;
+use Fliglio\Borg\Type\ArgMapper;
 
 class InvokerTest extends \PHPUnit_Framework_TestCase {
 	private $driver;
@@ -45,7 +46,7 @@ class InvokerTest extends \PHPUnit_Framework_TestCase {
 		
 		$args = [$this->msg, $this->ch, $this->foo];
 
-		$vos = ArgParser::marshalArgs($args);
+		$vos = ArgMapper::marshalArgs($args);
 
 		// when
 		$resp = $invoker->handleRequest($this, 'myTestMethod', $vos);
@@ -64,7 +65,7 @@ class InvokerTest extends \PHPUnit_Framework_TestCase {
 		
 		$args = [$this->msg, $this->foo, $this->ch];
 
-		$vos = ArgParser::marshalArgs($args);
+		$vos = ArgMapper::marshalArgs($args);
 
 		// when
 		$invoker->handleRequest($this, 'myTestMethod', $vos);
@@ -79,7 +80,7 @@ class InvokerTest extends \PHPUnit_Framework_TestCase {
 		
 		$args = [$this->msg, $this->ch, $this->foo, "extra"];
 
-		$vos = ArgParser::marshalArgs($args);
+		$vos = ArgMapper::marshalArgs($args);
 
 		// when
 		$invoker->handleRequest($this, 'myTestMethod', $vos);
@@ -94,7 +95,7 @@ class InvokerTest extends \PHPUnit_Framework_TestCase {
 		
 		$args = [$this->msg, $this->ch];
 
-		$vos = ArgParser::marshalArgs($args);
+		$vos = ArgMapper::marshalArgs($args);
 
 		// when
 		$invoker->dispatchRequest($this, 'myTestMethod', $vos);
