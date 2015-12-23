@@ -15,8 +15,8 @@ class CollectiveInvoker {
 
 	public function sendRequest($topic, $args, $inst, $method) {
 		$types = TypeUtil::getTypesForMethod($inst, $method);
-		$data = ArgMapper::marshalArgs($args, $types);
-		$this->driver->go($topic->getTopicString(), $data);
+		$vos = ArgMapper::marshalArgs($args, $types);
+		$this->driver->go($topic->getTopicString(), $vos);
 	}
 
 	/**
@@ -26,13 +26,10 @@ class CollectiveInvoker {
 	 * the specified method on the specified drone with those args.
 	 */
 	public function handleRequest($inst, $method, array $vos) {
-		
-		$args = ArgMapper::unmarshalArgs(
-			$this->driver,
-			TypeUtil::getTypesForMethod($inst, $method),
-			$vos
-		);
+		$types = TypeUtil::getTypesForMethod($inst, $method);
+
+		$entities = ArgMapper::unmarshalArgs($this->driver, $types, $vos);
 	
-		return call_user_func_array([$inst, $method], $args);
+		return call_user_func_array([$inst, $method], $entities);
 	}
 }

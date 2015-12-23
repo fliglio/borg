@@ -24,9 +24,6 @@ class ChanTypeMapper {
 	 *                  process persistence
 	 */
 	public function __construct($type, CollectiveDriver $factory) {
-		if (!TypeUtil::isMarshallableType($type)) {
-			throw new \Exception(sprintf("Type '%s' isn't marshallable", $type));
-		}
 		$this->type = $type;
 		
 		$this->factory = $factory;

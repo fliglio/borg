@@ -4,7 +4,7 @@ namespace Fliglio\Borg\Type;
 use Fliglio\Borg\Chan\Chan;
 use Fliglio\Borg\Api\Foo;
 
-class ArgParserTest extends \PHPUnit_Framework_TestCase {
+class ArgMapperTest extends \PHPUnit_Framework_TestCase {
 	private $driver;
 
 	public function setup() {

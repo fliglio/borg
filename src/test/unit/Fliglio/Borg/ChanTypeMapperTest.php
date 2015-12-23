@@ -75,7 +75,8 @@ class ChanTypeMapperTest extends \PHPUnit_Framework_TestCase {
 		$type = get_class($this);
 
 		// when
-		new ChanTypeMapper($type, $this->driver);
+		$m = new ChanTypeMapper($type, $this->driver);
+		$m->marshal($this);
 	}
 	
 	/**
@@ -86,7 +87,8 @@ class ChanTypeMapperTest extends \PHPUnit_Framework_TestCase {
 		$type = 123;
 
 		// when
-		new ChanTypeMapper($type, $this->driver);
+		$m = new ChanTypeMapper($type, $this->driver);
+		$m->marshal(123);
 	}
 	/**
 	 * @expectedException \Exception
