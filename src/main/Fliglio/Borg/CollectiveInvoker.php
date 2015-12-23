@@ -13,12 +13,16 @@ class CollectiveInvoker {
 		$this->driver = $driver;
 	}
 
-	public function sendRequest($topic, $args, $inst, $method) {
+	public function marshal($args, $inst, $method) {
 		$types = TypeUtil::getTypesForMethod($inst, $method);
-		$vos = ArgMapper::marshalArgs($args, $types);
-		$this->driver->go($topic->getTopicString(), $vos);
+		return  ArgMapper::marshalArgs($args, $types);
 	}
 
+	public function unmarshal(array $vos, $inst, $method) {
+		$types = TypeUtil::getTypesForMethod($inst, $method);
+
+		return ArgMapper::unmarshalArgs($this->driver, $types, $vos);
+	}
 	/**
 	 * Make the collective async routine call on the specified drone
 	 *

@@ -54,7 +54,9 @@ class Collective {
 	 */
 	public function dispatch($drone, $method, array $args, $dc) {
 		$topic = new TopicConfiguration($this->svcNs, $dc, $drone, $method);
-		$this->invoker->sendRequest($topic, $args, $drone, $method);
+		$vos = $this->invoker->marshal($args, $drone, $method);
+	
+		$this->driver->go($topic->getTopicString(), $vos);
 	}
 
 	/**
@@ -67,9 +69,10 @@ class Collective {
 
 		$topic = TopicConfiguration::fromTopicString($r->getHeader("X-routing-key"));
 		$inst = $this->lookupDrone($topic->getType());
-		$body = json_decode($r->getBody(), true);
-	
-		return $this->invoker->handleRequest($inst, $topic->getMethod(), $body);
+		$vos = json_decode($r->getBody(), true);
+		
+		$entities = $this->invoker->unmarshal($vos, $inst, $topic->getMethod());
+		return call_user_func_array([$inst, $topic->getMethod()], $entities);
 	}
 
 	private function lookupDrone($type) {
