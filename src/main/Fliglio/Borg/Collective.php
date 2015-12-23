@@ -52,9 +52,9 @@ class Collective {
 	/**
 	 * Dispatch a new call
 	 */
-	public function dispatch($collectiveDrone, $method, array $args, $dc) {
-		$topic = new TopicConfiguration($this->svcNs, $dc, $collectiveDrone, $method);
-		$this->invoker->sendRequest($topic, $args);
+	public function dispatch($drone, $method, array $args, $dc) {
+		$topic = new TopicConfiguration($this->svcNs, $dc, $drone, $method);
+		$this->invoker->sendRequest($topic, $args, $drone, $method);
 	}
 
 	/**

@@ -37,10 +37,7 @@ class ChanTypeMapper {
 	}
 
 	public function marshal($entity) {
-		if (!TypeUtil::isA($entity, $this->type)) {
-			throw new \Exception(sprintf("This Chan expects a %s", $this->type));
-		}
-		return ArgMapper::marshalArg($entity);
+		return ArgMapper::marshalArg($entity, $this->type);
 	}
 
 	public function unmarshal($vo) {

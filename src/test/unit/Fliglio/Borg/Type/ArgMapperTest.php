@@ -39,7 +39,7 @@ class ArgParserTest extends \PHPUnit_Framework_TestCase {
 		$types = array_fill(0, count($entities), null); // no hints are provided for primitives
 
 		// when
-		$vos = ArgMapper::marshalArgs($entities);
+		$vos = ArgMapper::marshalArgs($entities, $types);
 		
 		$found = ArgMapper::unmarshalArgs($this->driver, $types, $vos);
 
@@ -57,7 +57,7 @@ class ArgParserTest extends \PHPUnit_Framework_TestCase {
 		$types = array_fill(0, count($entities), Foo::getClass());
 
 		// when
-		$vos = ArgMapper::marshalArgs($entities);
+		$vos = ArgMapper::marshalArgs($entities, $types);
 		
 		$found = ArgMapper::unmarshalArgs($this->driver, $types, $vos);
 
@@ -79,7 +79,7 @@ class ArgParserTest extends \PHPUnit_Framework_TestCase {
 		$types = array_fill(0, count($entities), Chan::CLASSNAME);
 
 		// when
-		$vos = ArgMapper::marshalArgs($entities);
+		$vos = ArgMapper::marshalArgs($entities, $types);
 		
 		$found = ArgMapper::unmarshalArgs($this->driver, $types, $vos);
 
@@ -108,7 +108,7 @@ class ArgParserTest extends \PHPUnit_Framework_TestCase {
 		];
 
 		// when
-		$vos = ArgMapper::marshalArgs($entities);
+		$vos = ArgMapper::marshalArgs($entities, $types);
 		
 		$found = ArgMapper::unmarshalArgs($this->driver, $types, $vos);
 

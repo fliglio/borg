@@ -4,6 +4,7 @@ namespace Fliglio\Borg;
 use Fliglio\Borg\Chan\Chan;
 use Fliglio\Borg\Api\Foo;
 use Fliglio\Borg\Type\ArgMapper;
+use Fliglio\Borg\Type\TypeUtil;
 
 class InvokerTest extends \PHPUnit_Framework_TestCase {
 	private $driver;
@@ -45,8 +46,7 @@ class InvokerTest extends \PHPUnit_Framework_TestCase {
 		$invoker = new CollectiveInvoker($this->driver);
 		
 		$args = [$this->msg, $this->ch, $this->foo];
-
-		$vos = ArgMapper::marshalArgs($args);
+		$vos = ArgMapper::marshalArgs($args, TypeUtil::getTypesForMethod($this, 'myTestMethod'));
 
 		// when
 		$resp = $invoker->handleRequest($this, 'myTestMethod', $vos);
@@ -65,7 +65,7 @@ class InvokerTest extends \PHPUnit_Framework_TestCase {
 		
 		$args = [$this->msg, $this->foo, $this->ch];
 
-		$vos = ArgMapper::marshalArgs($args);
+		$vos = ArgMapper::marshalArgs($args, TypeUtil::getTypesForMethod($this, 'myTestMethod'));
 
 		// when
 		$invoker->handleRequest($this, 'myTestMethod', $vos);
@@ -79,8 +79,7 @@ class InvokerTest extends \PHPUnit_Framework_TestCase {
 		$invoker = new CollectiveInvoker($this->driver);
 		
 		$args = [$this->msg, $this->ch, $this->foo, "extra"];
-
-		$vos = ArgMapper::marshalArgs($args);
+		$vos = ArgMapper::marshalArgs($args, TypeUtil::getTypesForMethod($this, 'myTestMethod'));
 
 		// when
 		$invoker->handleRequest($this, 'myTestMethod', $vos);

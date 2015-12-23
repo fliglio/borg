@@ -13,8 +13,9 @@ class CollectiveInvoker {
 		$this->driver = $driver;
 	}
 
-	public function sendRequest($topic, $args) {
-		$data = ArgMapper::marshalArgs($args);
+	public function sendRequest($topic, $args, $inst, $method) {
+		$types = TypeUtil::getTypesForMethod($inst, $method);
+		$data = ArgMapper::marshalArgs($args, $types);
 		$this->driver->go($topic->getTopicString(), $data);
 	}
 

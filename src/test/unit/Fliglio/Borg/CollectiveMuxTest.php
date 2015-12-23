@@ -5,7 +5,7 @@ use Fliglio\Borg\Chan\Chan;
 use Fliglio\Borg\Api\Foo;
 use Fliglio\Flfc\Request;
 use Fliglio\Borg\Type\ArgMapper;
-
+use FLiglio\Borg\Type\TypeUtil;
 
 class CollectiveMux extends \PHPUnit_Framework_TestCase {
 	use BorgImplant;
@@ -50,7 +50,7 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 		$coll->assimilate($this);
 		
 		$args = [$this->msg, $this->ch, $this->foo];
-		$vos = ArgMapper::marshalArgs($args);
+		$vos = ArgMapper::marshalArgs($args, TypeUtil::getTypesForMethod($this, 'myTestMethod'));
 		
 		$topic = new TopicConfiguration("test", "default", get_class($this), "myTestMethod");
 		
@@ -74,7 +74,7 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 		$coll->assimilate($this);
 		
 		$args = [$this->msg, $this->ch, $this->foo];
-		$vos = ArgMapper::marshalArgs($args);
+		$vos = ArgMapper::marshalArgs($args, TypeUtil::getTypesForMethod($this, 'myTestMethod'));
 		
 		$topic = new TopicConfiguration("test", "default", get_class($this), "myTestMethod");
 		
@@ -97,7 +97,7 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 		$coll->assimilate($this);
 		
 		$args = [$this->msg, $this->ch, $this->foo];
-		$vos = ArgMapper::marshalArgs($args);
+		$vos = ArgMapper::marshalArgs($args, TypeUtil::getTypesForMethod($this, 'myTestMethod'));
 		
 		$topic = new TopicConfiguration("test", "default", "what", "myTestMethod");
 		
@@ -120,7 +120,7 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 		$coll->assimilate($this);
 		
 		$args = [$this->msg, $this->ch, $this->foo];
-		$vos = ArgMapper::marshalArgs($args);
+		$vos = ArgMapper::marshalArgs($args, TypeUtil::getTypesForMethod($this, 'myTestMethod'));
 		
 		$topic = new TopicConfiguration("test", "default", get_class($this), "dne");
 		

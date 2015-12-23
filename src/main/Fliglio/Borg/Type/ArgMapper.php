@@ -8,16 +8,25 @@ use Fliglio\Borg\Type\Primitive;
 
 class ArgMapper {
 
-	public static function marshalArgs(array $args) {
+	public static function marshalArgs(array $args, array $types) {
 		$data = [];
 
-		foreach ($args as $arg) {
-			$data[] = self::marshalArg($arg);
+		for ($i = 0; $i < count($args); $i++) {
+			$type = $types[$i];
+			$arg = $args[$i];
+			$data[] = self::marshalArg($arg, $type);
 		}
 		return $data;
 	}
 
-	public static function marshalArg($arg) {
+	public static function marshalArg($arg, $type) {
+		if (!TypeUtil::isMarshallableType($type)) {
+			throw new \Exception(sprintf("Type '%s' isn't marshallable", $type));
+		}
+		if (!TypeUtil::isA($arg, $type)) {
+			throw new \Exception(sprintf("cannot marshal entity with %s", $type));
+		}
+
 		// wrap primitive
 		if (!is_object($arg)) {
 			$arg = new Primitive($arg);
