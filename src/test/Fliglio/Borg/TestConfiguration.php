@@ -16,21 +16,18 @@ use PhpAmqpLib\Connection\AMQPStreamConnection;
 
 class TestConfiguration extends DefaultConfiguration {
 
-
-	protected function getTestResource() {
-		return new TestResource();
-	}
-
 	public function getRoutes() {
 		$rConn = new AMQPStreamConnection('localhost', 5672, "guest", "guest", "/");
 		$driver = new AmqpCollectiveDriver($rConn);
 	
-		$resource = $this->getTestResource();
+		$resource = new TestResource();
+		$fun = new FunResource;
 		
 		$mapper = new DefaultMapper($driver);
 		$routing = new RoutingConfiguration("borg-demo");
 		$coll = new Collective($driver, $mapper, $routing);
 		$coll->assimilate($resource);
+		$coll->assimilate($fun);
 
 
 
@@ -45,19 +42,20 @@ class TestConfiguration extends DefaultConfiguration {
 				->resource($resource, 'chanChan')
 				->method(Http::METHOD_GET)
 				->build(),
+
 			RouteBuilder::get()
 				->uri('/fibonacci')
-				->resource($resource, 'fibonacci')
+				->resource($fun, 'fibonacci')
 				->method(Http::METHOD_GET)
 				->build(),
 			RouteBuilder::get()
 				->uri('/pi')
-				->resource($resource, 'pi')
+				->resource($fun, 'pi')
 				->method(Http::METHOD_GET)
 				->build(),
 			RouteBuilder::get()
 				->uri('/prime')
-				->resource($resource, 'prime')
+				->resource($fun, 'prime')
 				->method(Http::METHOD_GET)
 				->build(),
 		
