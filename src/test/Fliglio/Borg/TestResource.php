@@ -64,7 +64,7 @@ class TestResource {
 		for ($i = 0; $i <= $limit; $i++) {
 			$ch->add($i);
 		}
-		sleep(.5); // there's a race condition here, not good!
+		sleep(1); // there's a race condition here, not good!
 		$ex->add(true);
 	}
 }
