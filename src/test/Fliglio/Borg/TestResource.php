@@ -47,18 +47,16 @@ class TestResource {
 		$this->coll()->gen($ch, $ex, $limit->get());
 		
 		$nums = [];
-		sleep(1); // not good...
+		// sleep(1); // not good...
 
 		$r = $this->coll()->mkChanReader([$ch, $ex]);
 		while (true) {
 			list($id, $val) = $r->get();
 			switch ($id) {
 			case $ch->getId():
-				error_log(">>>FOUND: ".$id);
 				$nums[] = $val;
 				break;
 			case $ex->getId():
-				error_log(">>>EXIT: ".$id);
 				return $nums;
 			}
 		}

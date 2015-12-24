@@ -46,42 +46,22 @@ class AmqpChanDriver implements ChanDriver {
 
 	// return array, null for none found
 	public function get() {
-		$msg = null;
-		while (is_null($msg)) {
+		while (true) {
 			$msg = $this->ch->basic_get($this->queueName);
+			if (!is_null($msg)) {
+				$this->ch->basic_ack($msg->delivery_info['delivery_tag']);
+		
+				$data =  json_decode($msg->body, true);
+				return $data;
+			}
 			usleep(1000);
 		}
-		$this->ch->basic_ack($msg->delivery_info['delivery_tag']);
-		
-		$data =  json_decode($msg->body, true);
-		return $data;
 	}
-	/*
-	private function blockingGet() {
-		// queue: Queue from where to get the messages
-		// consumer_tag: Consumer identifier
-		// no_local: Don't receive messages published by this consumer.
-		// no_ack: Tells the server if the consumer will acknowledge the messages.
-		// exclusive: Request exclusive consumer access, meaning only this consumer can access the queue
-		// nowait:
-		// callback: A PHP Callback
-		$this->ch->basic_consume($this->queueName, '', false, false, false, false, function($msg) {
-			error_log($msg->body);
-			$this->msgCache = json_decode($msg->body);
-			$this->ch->basic_ack($msg->delivery_info['delivery_tag']);
-			$this->ch->basic_cancel($msg->delivery_info['consumer_tag']);
-		});
-		while (count($this->ch->callbacks)) {
-			$this->ch->wait();
-		}
-		return $this->msgCache;
-	}
-	 */
 
 	/**
 	 * Get the next message or null of none available
 	 *
-	 * not part of the ChanDriver api, support method for AmqpChanReaderDriver
+	 * (not part of ChanDriver api, support method for AmqpChanReaderDriver)
 	 */
 	public function nonBlockingGet() {
 		$msg = $this->ch->basic_get($this->queueName);
