@@ -20,9 +20,9 @@ class AmqpChanReaderDriver implements ChanReaderDriver {
 	public function get() {
 		while (true) {
 			foreach ($this->drivers as $driver) {
-				$resp = $driver->nonBlockingGet();
+				list($found, $resp) = $driver->nonBlockingGet();
 
-				if (!is_null($resp)) {
+				if ($found) {
 					return [$driver->getId(), $resp];
 				}
 			}

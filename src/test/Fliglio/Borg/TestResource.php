@@ -47,7 +47,6 @@ class TestResource {
 		$this->coll()->gen($ch, $ex, $limit->get());
 		
 		$nums = [];
-		// sleep(1); // not good...
 
 		$r = $this->coll()->mkChanReader([$ch, $ex]);
 		while (true) {
@@ -65,7 +64,7 @@ class TestResource {
 		for ($i = 0; $i <= $limit; $i++) {
 			$ch->add($i);
 		}
-
+		sleep(.5); // there's a race condition here, not good!
 		$ex->add(true);
 	}
 }

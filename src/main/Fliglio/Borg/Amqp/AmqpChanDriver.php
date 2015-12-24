@@ -54,7 +54,7 @@ class AmqpChanDriver implements ChanDriver {
 				$data =  json_decode($msg->body, true);
 				return $data;
 			}
-			usleep(1000);
+			usleep(1000); // 5 milliseconds
 		}
 	}
 
@@ -66,12 +66,12 @@ class AmqpChanDriver implements ChanDriver {
 	public function nonBlockingGet() {
 		$msg = $this->ch->basic_get($this->queueName);
 		if (is_null($msg)) {
-			return null;
+			return [false, null];
 		}
 		$this->ch->basic_ack($msg->delivery_info['delivery_tag']);
 		
 		$data =  json_decode($msg->body);
-		return $data;
+		return [true, $data];
 	}
 
 	// close connection
