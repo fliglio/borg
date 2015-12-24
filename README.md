@@ -13,34 +13,59 @@ don't solve problems by yourself, and you certainly don't do work by yourself - 
 
 And now you can too.
 
-## Usage
 
-### Parallel Work
-When the Borg encouter a group of unassimilated humans, the first thing they have to decide is whether or not they are a threat.
-One way to do this would be to look up the humans on Wikipedia, do some analysis for their threat level, and make a decision.
-But if you're a member of the Borg, you don't have to do this alone, you can farm out the work and have one member of the
-collective do the reasearch for each human and report back, and then aggregate the sum information to make a decision.
 
-class ThreatAssessment {
-	use BorgImplant;
 
-	public function assessThreatOfGroup(Entity $e) {
-		$names = $e->bind(Names::getClass());
 
-		$indicators = $this->mkchan(ThreatIndicator::getClass());
 
-		foreach ($names as $name) {
-			$this->coll()->assessThreatOfHuman($name, $indicators, $exits)
+
+### TODO / Caveats
+
+#### Next
+
+- support sending `null` to Chans and Collective Routines
+
+#### Other
+
+- Collective Routines must be exact types. You can't hint your method with an interface and pass in an
+  implementation (the hint is used to unmarshal the argument.)
+- Only Collective Routines are multi-datacenter aware. Chans can only be used in your local datacenter.
+- Though Chan ordering is always guaranteed, ChanReader introduces some weirdness where messages published to
+  different Chans might be read out of order (see below)
+- `Chan::get` is implemented by polling `basic_get`. It would be nice to iteratively use `basic_consume`
+
+#### ChanReader
+There is a race condition with ChanReaders where order between channels can't be guaranteed.
+In the following example, even though `$ex` is added to after all numbers have been added to `$ch`,
+The `$ex` value might arraive in the `ChanReader` first. In this situation, consider
+sending a `null` to `$ch` to signal that the work is done.
+
+
+
+	public function generateNumbers(GetParam $limit) {
+		$ch = $this->mkChan();
+		$ex = $this->mkChan();
+
+		$this->coll()->gen($ch, $ex, $limit->get());
+		
+		$nums = [];
+
+		$r = $this->coll()->mkChanReader([$ch, $ex]);
+		while (true) {
+			list($id, $val) = $r->get();
+			switch ($id) {
+			case $ch->getId():
+				$nums[] = $val;
+				break;
+			case $ex->getId():
+				return $nums;
+			}
 		}
-
 	}
-
-}
-
-
-
-### Distributed Work
-Now if a Borg decides there is a particularly threatening human, they might want to make sure they report it directly to
-the core of the collective and not rely on only notifying their team (what if all their team dies before the knowledge
-propogates to their main force!)
-
+	public function gen(Chan $ch, Chan $ex, $limit) {
+		for ($i = 0; $i <= $limit; $i++) {
+			$ch->add($i);
+		}
+		sleep(1); // there's a race condition here, not good!
+		$ex->add(true);
+	}
