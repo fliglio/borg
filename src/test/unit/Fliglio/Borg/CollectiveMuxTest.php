@@ -15,6 +15,8 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 	public $msg;
 	public $ch;
 	public $foo;
+	public $optArg;
+	const OPT_ARG_DEFAULT = "I'm The Default";
 
 	public function setup() {
 		$this->driver = $this->getMockBuilder('\Fliglio\Borg\Amqp\AmqpCollectiveDriver')
@@ -41,17 +43,11 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 		$this->msg = "hello world";
 		$this->ch = new Chan(null, $this->driver, $this->mapper);
 		$this->foo = new Foo("bar");
-	}
-	private function marshalArgs(array $args, array $types) {
-		$out = [];
-		for ($i = 0; $i < count($args); $i++) {
-			$out[] = $this->mapper->marshalArg($args[$i], $types[$i]);
-		}
-		return $out;
+		$this->optArg = "hello";
 	}
 
-	public function myTestMethod($msg, Chan $ch, Foo $foo) {
-		return [$msg, $ch, $foo];
+	public function myTestMethod($msg, Chan $ch, Foo $foo, $optArg = self::OPT_ARG_DEFAULT) {
+		return [$msg, $ch, $foo, $optArg];
 	}
 
 	public function testMux() {
@@ -59,7 +55,7 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 		$coll = new Collective($this->driver, $this->mapper, $this->routing);
 		$coll->assimilate($this);
 		
-		$args = [$this->msg, $this->ch, $this->foo];
+		$args = [$this->msg, $this->ch, $this->foo, $this->optArg];
 		$vos = $this->mapper->marshalForMethod($args, $this, 'myTestMethod');
 		
 		$topic = new TopicConfiguration("test", "default", get_class($this), "myTestMethod");
@@ -73,6 +69,28 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 
 		// then
 		$this->assertEquals($args, $resp, 'Unmarshalled vos should match original entities');
+	}
+	public function testMuxWithDefault() {
+		// given
+		$coll = new Collective($this->driver, $this->mapper, $this->routing);
+		$coll->assimilate($this);
+		
+		$args = [$this->msg, $this->ch, $this->foo];
+		$expected =  [$this->msg, $this->ch, $this->foo, self::OPT_ARG_DEFAULT];
+		$vos = $this->mapper->marshalForMethod($args, $this, 'myTestMethod');
+		
+		$topic = new TopicConfiguration("test", "default", get_class($this), "myTestMethod");
+		
+		$req = new Request();
+		$req->addHeader("X-routing-key", $topic->getTopicString());
+		$req->setBody(json_encode($vos));
+
+		// when
+		$resp = $coll->mux($req);
+
+		// then
+		
+		$this->assertEquals($expected, $resp, 'Unmarshalled vos should match original entities plus the default for the optional arg');
 	}
 
 	/**

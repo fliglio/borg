@@ -28,19 +28,39 @@ class DefaultMapperTest extends \PHPUnit_Framework_TestCase {
 			}));
 		$this->mapper = new DefaultMapper($this->driver);
 	}
-	private function marshalArgs(array $args, array $types) {
-		$out = [];
-		for ($i = 0; $i < count($args); $i++) {
-			$out[] = $this->mapper->marshalArg($args[$i], $types[$i]);
-		}
-		return $out;
+
+	public function StubCollectiveRoutineMethod($prim, Chan $ch, Foo $foo, $optionalArg = null) {}
+	public function testMarshalForMethod() {
+		// given
+		$entities = [
+			"hello world",
+			new Chan(null, $this->driver, $this->mapper),
+			new Foo("bar"),
+			123,
+		];
+
+		// when
+		$vos = $this->mapper->marshalForMethod($entities, $this, 'StubCollectiveRoutineMethod');
+		$found = $this->mapper->unmarshalForMethod($vos, $this, 'StubCollectiveRoutineMethod');
+
+		// then
+		$this->assertEquals($entities, $found, 'Unmarshalled vos should match original entities');
 	}
-	private function unmarshalArgs(array $args, array $types) {
-		$out = [];
-		for ($i = 0; $i < count($args); $i++) {
-			$out[] = $this->mapper->unmarshalArg($args[$i], $types[$i]);
-		}
-		return $out;
+	public function testMarshalForMethodWithDefaults() {
+		// given
+		$entities = [
+			"hello world",
+			new Chan(null, $this->driver, $this->mapper),
+			new Foo("bar"),
+			123,
+		];
+
+		// when
+		$vos = $this->mapper->marshalForMethod($entities, $this, 'StubCollectiveRoutineMethod');
+		$found = $this->mapper->unmarshalForMethod($vos, $this, 'StubCollectiveRoutineMethod');
+
+		// then
+		$this->assertEquals($entities, $found, 'Unmarshalled vos should match original entities');
 	}
 
 	public function testMarshalPrimitive() {
@@ -50,35 +70,37 @@ class DefaultMapperTest extends \PHPUnit_Framework_TestCase {
 			123,
 			1.2,
 			false,
+			["foo", "bar"],
+			null,
 		];
 		
-		$types = array_fill(0, count($entities), null); // no hints are provided for primitives
+		foreach ($entities as $entity) {
+			
+			// when
+			$vo = $this->mapper->marshalArg($entity, null); // null type for primitive
+			$found = $this->mapper->unmarshalArg($vo, null);
 
-		// when
-		$vos = $this->marshalArgs($entities, $types);
-		
-		$found = $this->unmarshalArgs($vos, $types);
-
-		// then
-		$this->assertEquals($entities, $found, 'Unmarshalled vos should match original entities');
+			// then
+			$this->assertEquals($entity, $found, 'Unmarshalled vos should match original entities');
+		}
 	}
 
 	public function testMarshalMappableApi() {
 		// given
 		$entities = [
 			new Foo("foo"),
-			new Foo("bar"),
+			null,
 		];
 		
-		$types = array_fill(0, count($entities), Foo::getClass());
+		foreach ($entities as $entity) {
+			
+			// when
+			$vo = $this->mapper->marshalArg($entity, Foo::getClass());
+			$found = $this->mapper->unmarshalArg($vo, Foo::getClass());
 
-		// when
-		$vos = $this->marshalArgs($entities, $types);
-		
-		$found = $this->unmarshalArgs($vos, $types);
-
-		// then
-		$this->assertEquals($entities, $found, 'Unmarshalled vos should match original entities');
+			// then
+			$this->assertEquals($entity, $found, 'Unmarshalled vos should match original entities');
+		}
 	}
 	
 	public function testMarshalChan() {
@@ -90,45 +112,18 @@ class DefaultMapperTest extends \PHPUnit_Framework_TestCase {
 			new Chan(Chan::CLASSNAME, $this->driver, $this->mapper, uniqid()),
 			new Chan(Foo::getClass(), $this->driver, $this->mapper),
 			new Chan(Foo::getClass(), $this->driver, $this->mapper, uniqid()),
+			null,
 		];
 		
-		$types = array_fill(0, count($entities), Chan::CLASSNAME);
+		foreach ($entities as $entity) {
+			
+			// when
+			$vo = $this->mapper->marshalArg($entity, Chan::CLASSNAME);
+			$found = $this->mapper->unmarshalArg($vo, Chan::CLASSNAME);
 
-		// when
-		$vos = $this->marshalArgs($entities, $types);
-		
-		$found = $this->unmarshalArgs($vos, $types);
-
-		// then
-		$this->assertEquals($entities, $found, 'Unmarshalled vos should match original entities');
+			// then
+			$this->assertEquals($entity, $found, 'Unmarshalled vos should match original entities');
+		}
 	}
 	
-	public function testMarshalMix() {
-		// given
-		$entities = [
-			"asdf",
-			new Foo("foo"),
-			new Chan(Foo::getClass(), $this->driver, $this->mapper),
-			false,
-			new Foo("bar"),
-			new Chan(null, $this->driver, $this->mapper),
-		];
-		
-		$types = [
-			null,
-			Foo::getClass(),
-			Chan::CLASSNAME,
-			null,
-			Foo::getClass(),
-			Chan::CLASSNAME,
-		];
-
-		// when
-		$vos = $this->marshalArgs($entities, $types);
-		
-		$found = $this->unmarshalArgs($vos, $types);
-
-		// then
-		$this->assertEquals($entities, $found, 'Unmarshalled vos should match original entities');
-	}
 }

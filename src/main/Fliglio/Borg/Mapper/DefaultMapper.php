@@ -16,10 +16,17 @@ class DefaultMapper implements WireMapper {
 		$this->driver = $driver;
 	}
 
-	public function marshalForMethod(array $args, $inst, $method) {
-		$types = self::getTypesForMethod($inst, $method);
-		$data = [];
+	private function validateParameterCount($numArgs, $numTypes, $numOpt) {
+		if (($numTypes < $numArgs) || (($numTypes - $numOpt) > $numArgs)) {
+			throw new \Exception("Wrong number of args for method signature.");
+		}
+	}
 
+	public function marshalForMethod(array $args, $inst, $method) {
+		list($types, $optionalArgs) = self::getTypesForMethod($inst, $method);
+		$this->validateParameterCount(count($args), count($types), $optionalArgs);
+		
+		$data = [];
 		for ($i = 0; $i < count($args); $i++) {
 			$type = $types[$i];
 			$arg = $args[$i];
@@ -29,11 +36,8 @@ class DefaultMapper implements WireMapper {
 	}
 
 	public function unmarshalForMethod(array $vos, $inst, $method) {
-		$types = self::getTypesForMethod($inst, $method);
-
-		if (count($types) < count($vos)) {
-			throw new \Exception("too many args for method signature.");
-		}
+		list($types, $optionalArgs) = self::getTypesForMethod($inst, $method);
+		$this->validateParameterCount(count($vos), count($types), $optionalArgs);
 
 		$argEntities = [];
 		for ($i = 0; $i < count($vos); $i++) {
@@ -47,6 +51,11 @@ class DefaultMapper implements WireMapper {
 		if (!self::isMarshallableType($type)) {
 			throw new \Exception(sprintf("Type '%s' isn't marshallable", $type));
 		}
+		// always allow null
+		if (is_null($arg)) {
+			return null;
+		}
+
 		if (!self::isA($arg, $type)) {
 			throw new \Exception(sprintf("cannot marshal entity with %s", $type));
 		}
@@ -68,6 +77,15 @@ class DefaultMapper implements WireMapper {
 	}
 
 	public function unmarshalArg($arg, $type) {
+		if (!self::isMarshallableType($type)) {
+			throw new \Exception(sprintf("Type '%s' isn't marshallable", $type));
+		}
+		
+		// always allow null
+		if (is_null($arg)) {
+			return null;
+		}
+
 		// Primitive without a hint is expected
 		if (is_null($type)) {
 			return $arg;
@@ -117,8 +135,12 @@ class DefaultMapper implements WireMapper {
 		
 		$params = $rMethod->getParameters();
 
+		$optionalArgs = 0;
 		$types = [];
 		foreach ($params as $param) {
+			if ($param->isOptional()) {
+				$optionalArgs++;
+			}
 			$cl = $param->getClass();
 			
 			if (is_null($cl)) {
@@ -128,7 +150,7 @@ class DefaultMapper implements WireMapper {
 			}
 		}
 
-		return $types;
+		return [$types, $optionalArgs];
 	}
 
 }
