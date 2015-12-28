@@ -50,7 +50,7 @@ class Collective {
 	}
 
 	/**
-	 * Create a new reader to read from multiple chans
+	 * Create a new ChanReader and return it
 	 */
 	public function mkChanReader(array $chans) {
 		return new ChanReader($this->driver, $this->mapper, $chans);
@@ -73,12 +73,18 @@ class Collective {
 	 */
 	public function mux(RequestReader $r) {
 		$topic = $this->buildTopic($r);
-		$inst = $this->lookupDrone($topic->getType());
+		$type = $topic->getType();
+		$inst = $this->lookupDrone($type);
 		$method = $topic->getMethod();
 		$vos = json_decode($r->getBody(), true);
 		
 		$entities = $this->mapper->unmarshalForMethod($vos, $inst, $method);
-		return call_user_func_array([$inst, $method], $entities);
+
+		if (is_callable([$inst, $method])) {
+			return call_user_func_array([$inst, $method], $entities);
+		} else {
+			throw new \Exception(sprintf("Routine '%s::%s' not callable", $type, $method));
+		}
 	}
 
 	private function buildTopic(RequestReader $r) {

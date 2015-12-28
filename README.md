@@ -24,6 +24,7 @@ And now you can too.
 #### Next
 
 - support sending `null` to Chans and Collective Routines
+	- make match typical php behavior ([see here](http://artur.ejsmont.org/blog/content/php-typehints-causing-errors-when-null-gets-passed-in))
 
 #### Other
 

@@ -33,8 +33,8 @@ class TestConfiguration extends DefaultConfiguration {
 
 		return [
 			RouteBuilder::get()
-				->uri('/test')
-				->resource($resource, 'test')
+				->uri('/round-trip')
+				->resource($resource, 'roundTrip')
 				->method(Http::METHOD_GET)
 				->build(),
 			RouteBuilder::get()
@@ -45,6 +45,11 @@ class TestConfiguration extends DefaultConfiguration {
 			RouteBuilder::get()
 				->uri('/generate-numbers')
 				->resource($resource, 'generateNumbers')
+				->method(Http::METHOD_GET)
+				->build(),
+			RouteBuilder::get()
+				->uri('/generate-numbers-2')
+				->resource($resource, 'generateNumbersTwo')
 				->method(Http::METHOD_GET)
 				->build(),
 

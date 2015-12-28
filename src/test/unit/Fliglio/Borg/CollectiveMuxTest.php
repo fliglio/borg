@@ -4,6 +4,7 @@ namespace Fliglio\Borg;
 use Fliglio\Borg\Api\Foo;
 use Fliglio\Flfc\Request;
 use Fliglio\Borg\Mapper\DefaultMapper;
+use Fliglio\Borg\Test\MockCollectiveDriverFactory;
 
 class CollectiveMux extends \PHPUnit_Framework_TestCase {
 	use BorgImplant;
@@ -12,38 +13,13 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 	private $mapper;
 	private $routing;
 		
-	public $msg;
-	public $ch;
-	public $foo;
 	public $optArg;
 	const OPT_ARG_DEFAULT = "I'm The Default";
 
 	public function setup() {
-		$this->driver = $this->getMockBuilder('\Fliglio\Borg\Amqp\AmqpCollectiveDriver')
-			->disableOriginalConstructor()
-			->getMock();
-		$this->driver->method('createChan')
-			->will($this->returnCallback(function($id = null) {
-				if (is_null($id)) {
-					$id = uniqid();
-				}
-				$chanDriver = $this->getMockBuilder('\Fliglio\Borg\Amqp\AmqpChanDriver')
-					->disableOriginalConstructor()
-					->getMock();
-		
-				$chanDriver->method('getId')
-					->willReturn($id);
-
-				return $chanDriver;
-			}));
-
+		$this->driver = MockCollectiveDriverFactory::get();
 		$this->routing = new RoutingConfiguration("borg-demo");
 		$this->mapper = new DefaultMapper($this->driver);
-
-		$this->msg = "hello world";
-		$this->ch = new Chan(null, $this->driver, $this->mapper);
-		$this->foo = new Foo("bar");
-		$this->optArg = "hello";
 	}
 
 	public function myTestMethod($msg, Chan $ch, Foo $foo, $optArg = self::OPT_ARG_DEFAULT) {
@@ -55,7 +31,12 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 		$coll = new Collective($this->driver, $this->mapper, $this->routing);
 		$coll->assimilate($this);
 		
-		$args = [$this->msg, $this->ch, $this->foo, $this->optArg];
+		$args = [
+			"hello world",
+			new Chan(null, $this->driver, $this->mapper),
+			new Foo("bar"),
+			"hello",
+		];
 		$vos = $this->mapper->marshalForMethod($args, $this, 'myTestMethod');
 		
 		$topic = new TopicConfiguration("test", "default", get_class($this), "myTestMethod");
@@ -70,13 +51,22 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 		// then
 		$this->assertEquals($args, $resp, 'Unmarshalled vos should match original entities');
 	}
-	public function testMuxWithDefault() {
+	public function testMuxWithDefaultParameter() {
 		// given
 		$coll = new Collective($this->driver, $this->mapper, $this->routing);
 		$coll->assimilate($this);
 		
-		$args = [$this->msg, $this->ch, $this->foo];
-		$expected =  [$this->msg, $this->ch, $this->foo, self::OPT_ARG_DEFAULT];
+		$args = [
+			"hello world",
+			new Chan(null, $this->driver, $this->mapper),
+			new Foo("bar"),
+		];
+		$expected = [
+			"hello world",
+			new Chan(null, $this->driver, $this->mapper),
+			new Foo("bar"),
+			self::OPT_ARG_DEFAULT,
+		];
 		$vos = $this->mapper->marshalForMethod($args, $this, 'myTestMethod');
 		
 		$topic = new TopicConfiguration("test", "default", get_class($this), "myTestMethod");
@@ -101,7 +91,11 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 		$coll = new Collective($this->driver, $this->mapper, $this->routing);
 		$coll->assimilate($this);
 		
-		$args = [$this->msg, $this->ch, $this->foo];
+		$args = [
+			"hello world",
+			new Chan(null, $this->driver, $this->mapper),
+			new Foo("bar"),
+		];
 		$vos = $this->mapper->marshalForMethod($args, $this, 'myTestMethod');
 		
 		$topic = new TopicConfiguration("test", "default", get_class($this), "myTestMethod");
@@ -111,9 +105,6 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 
 		// when
 		$resp = $coll->mux($req);
-
-		// then
-		$this->assertEquals($args, $resp, 'Unmarshalled vos should match original entities');
 	}
 	
 	/**
@@ -124,7 +115,11 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 		$coll = new Collective($this->driver, $this->mapper, $this->routing);
 		$coll->assimilate($this);
 		
-		$args = [$this->msg, $this->ch, $this->foo];
+		$args = [
+			"hello world",
+			new Chan(null, $this->driver, $this->mapper),
+			new Foo("bar"),
+		];
 		$vos = $this->mapper->marshalForMethod($args, $this, 'myTestMethod');
 		
 		$topic = new TopicConfiguration("test", "default", "what", "myTestMethod");
@@ -135,9 +130,6 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 
 		// when
 		$resp = $coll->mux($req);
-
-		// then
-		$this->assertEquals($args, $resp, 'Unmarshalled vos should match original entities');
 	}
 	/**
 	 * @expectedException \Exception
@@ -147,7 +139,11 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 		$coll = new Collective($this->driver, $this->mapper, $this->routing);
 		$coll->assimilate($this);
 		
-		$args = [$this->msg, $this->ch, $this->foo];
+		$args = [
+			"hello world",
+			new Chan(null, $this->driver, $this->mapper),
+			new Foo("bar"),
+		];
 		$vos = $this->mapper->marshalForMethod($args, $this, 'myTestMethod');
 		
 		$topic = new TopicConfiguration("test", "default", get_class($this), "dne");
@@ -158,8 +154,5 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 
 		// when
 		$resp = $coll->mux($req);
-
-		// then
-		$this->assertEquals($args, $resp, 'Unmarshalled vos should match original entities');
 	}
 }

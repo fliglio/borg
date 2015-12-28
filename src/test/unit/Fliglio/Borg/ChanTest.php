@@ -3,6 +3,7 @@ namespace Fliglio\Borg;
 
 use Fliglio\Borg\Api\Foo;
 use Fliglio\Borg\Mapper\DefaultMapper;
+use Fliglio\Borg\Test\MockCollectiveDriverFactory;
 
 class ChanTest extends \PHPUnit_Framework_TestCase {
 	private $driver;
@@ -11,31 +12,7 @@ class ChanTest extends \PHPUnit_Framework_TestCase {
 	public static $q = [];
 
 	public function setup() {
-		$this->driver = $this->getMockBuilder('\Fliglio\Borg\Amqp\AmqpCollectiveDriver')
-			->disableOriginalConstructor()
-			->getMock();
-		$this->driver->method('createChan')
-			->will($this->returnCallback(function($id = null) {
-				if (is_null($id)) {
-					$id = uniqid();
-				}
-				$chanDriver = $this->getMockBuilder('\Fliglio\Borg\Amqp\AmqpChanDriver')
-					->disableOriginalConstructor()
-					->getMock();
-		
-				$chanDriver->method('getId')
-					->willReturn($id);
-				$chanDriver->method('get')
-					->will($this->returnCallback(function() {
-						return array_shift(ChanTest::$q);
-					}));
-				$chanDriver->method('add')
-					->will($this->returnCallback(function($vo) {
-						array_push(ChanTest::$q, $vo);
-					}));
-
-				return $chanDriver;
-			}));
+		$this->driver = MockCollectiveDriverFactory::get();
 		$this->mapper = new DefaultMapper($this->driver);
 	}
 

@@ -10,6 +10,17 @@ use Fliglio\Borg\BorgImplant;
 class TestResource {
 	use BorgImplant;
 
+	// basic round trip
+	public function roundTrip(GetParam $msg) {
+		$ch = $this->mkChan();
+		$this->coll()->worldAdder($msg->get(), $ch);
+
+		return $ch->get();
+	}
+	public function worldAdder($msg, Chan $ch) {
+		$ch->add($msg . " world");
+	}
+
 	// use a chan of type chan
 	public function chanChan(GetParam $msg) {
 		$exit = $this->mkChan();
@@ -26,17 +37,6 @@ class TestResource {
 		$ch->add($ch2);
 		
 		$exit->add($ch2->get() . " world");
-	}
-
-	// basic round trip
-	public function test(GetParam $msg) {
-		$ch = $this->mkChan();
-		$this->coll()->worldAdder($msg->get(), $ch);
-
-		return $ch->get();
-	}
-	public function worldAdder($msg, Chan $ch) {
-		$ch->add($msg . " world");
 	}
 
 	// test ChanReader
@@ -66,5 +66,28 @@ class TestResource {
 		}
 		sleep(1); // there's a race condition here, not good!
 		$ex->add(true);
+	}
+	
+	// test Passing null
+	public function generateNumbersTwo(GetParam $limit) {
+		$ch = $this->mkChan();
+
+		$this->coll()->genTwo($ch, $limit->get());
+		
+		$nums = [];
+
+		while (true) {
+			$num = $ch->get();
+			if (is_null($num)) {
+				return $nums;
+			}
+			$nums[] = $num;
+		}
+	}
+	public function genTwo(Chan $ch, $limit) {
+		for ($i = 0; $i <= $limit; $i++) {
+			$ch->add($i);
+		}
+		$ch->add(null);
 	}
 }

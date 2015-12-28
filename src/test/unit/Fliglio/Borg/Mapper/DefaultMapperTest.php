@@ -3,64 +3,15 @@ namespace Fliglio\Borg\Mapper;
 
 use Fliglio\Borg\Chan;
 use Fliglio\Borg\Api\Foo;
+use Fliglio\Borg\Test\MockCollectiveDriverFactory;
 
 class DefaultMapperTest extends \PHPUnit_Framework_TestCase {
 	private $driver;
 	private $mapper;
 
 	public function setup() {
-		$this->driver = $this->getMockBuilder('\Fliglio\Borg\Amqp\AmqpCollectiveDriver')
-			->disableOriginalConstructor()
-			->getMock();
-		$this->driver->method('createChan')
-			->will($this->returnCallback(function($id = null) {
-				if (is_null($id)) {
-					$id = uniqid();
-				}
-				$chanDriver = $this->getMockBuilder('\Fliglio\Borg\Amqp\AmqpChanDriver')
-					->disableOriginalConstructor()
-					->getMock();
-		
-				$chanDriver->method('getId')
-					->willReturn($id);
-
-				return $chanDriver;
-			}));
+		$this->driver = MockCollectiveDriverFactory::get();
 		$this->mapper = new DefaultMapper($this->driver);
-	}
-
-	public function StubCollectiveRoutineMethod($prim, Chan $ch, Foo $foo, $optionalArg = null) {}
-	public function testMarshalForMethod() {
-		// given
-		$entities = [
-			"hello world",
-			new Chan(null, $this->driver, $this->mapper),
-			new Foo("bar"),
-			123,
-		];
-
-		// when
-		$vos = $this->mapper->marshalForMethod($entities, $this, 'StubCollectiveRoutineMethod');
-		$found = $this->mapper->unmarshalForMethod($vos, $this, 'StubCollectiveRoutineMethod');
-
-		// then
-		$this->assertEquals($entities, $found, 'Unmarshalled vos should match original entities');
-	}
-	public function testMarshalForMethodWithDefaults() {
-		// given
-		$entities = [
-			"hello world",
-			new Chan(null, $this->driver, $this->mapper),
-			new Foo("bar"),
-			123,
-		];
-
-		// when
-		$vos = $this->mapper->marshalForMethod($entities, $this, 'StubCollectiveRoutineMethod');
-		$found = $this->mapper->unmarshalForMethod($vos, $this, 'StubCollectiveRoutineMethod');
-
-		// then
-		$this->assertEquals($entities, $found, 'Unmarshalled vos should match original entities');
 	}
 
 	public function testMarshalPrimitive() {
