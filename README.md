@@ -67,6 +67,9 @@ sending a `null` to `$ch` to signal that the work is done.
 		for ($i = 0; $i <= $limit; $i++) {
 			$ch->add($i);
 		}
-		sleep(1); // there's a race condition here, not good!
+
+		// sleep for a second to avoid the possibility that the $ex value is read before $ch's last value
+		sleep(1); 
+		
 		$ex->add(true);
 	}
