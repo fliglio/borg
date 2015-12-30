@@ -57,7 +57,7 @@ class DefaultMapper implements WireMapper {
 		return new RoutineRequest($topic, $entities, $exitCh, $retryErrors);
 	}
 
-	public function marshalForMethod(array $args, $inst, $method) {
+	private function marshalForMethod(array $args, $inst, $method) {
 		list($types, $optionalArgs) = self::getTypesForMethod($inst, $method);
 		self::validateParameterCount(count($args), count($types), $optionalArgs);
 		
@@ -70,7 +70,7 @@ class DefaultMapper implements WireMapper {
 		return $data;
 	}
 
-	public function unmarshalForMethod(array $vos, $inst, $method) {
+	private function unmarshalForMethod(array $vos, $inst, $method) {
 		list($types, $optionalArgs) = self::getTypesForMethod($inst, $method);
 		self::validateParameterCount(count($vos), count($types), $optionalArgs);
 

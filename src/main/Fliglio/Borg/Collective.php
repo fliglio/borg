@@ -57,7 +57,7 @@ class Collective {
 	}
 
 	/**
-	 * Call a collective routine async
+	 * Call a collective routine
 	 */
 	public function dispatch(RoutineRequest $req) {
 		$r = $this->mapper->marshalRoutineRequest($req);
@@ -65,7 +65,7 @@ class Collective {
 	}
 
 	/**
-	 * Handle a collective routing
+	 * Handle a collective routine
 	 *
 	 * Process HTTP request resulting from a `dispatch`
 	 */

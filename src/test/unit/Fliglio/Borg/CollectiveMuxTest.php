@@ -13,13 +13,21 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 	private $mapper;
 	private $routing;
 		
-	public $optArg;
+
 	const OPT_ARG_DEFAULT = "I'm The Default";
 
 	public function setup() {
 		$this->driver = MockCollectiveDriverFactory::get();
 		$this->routing = new RoutingConfiguration("borg-demo");
 		$this->mapper = new DefaultMapper($this->driver);
+		
+	}
+	private function buildRequest(array $entities) {
+		$topic = new TopicConfiguration('foo', 'bar', $this, 'myTestMethod');
+		$ex = new Chan(null, $this->driver, $this->mapper);
+		$r = new RoutineRequest($topic, $entities, $ex, false);
+
+		return $this->mapper->marshalRoutineRequest($r);
 	}
 
 	public function myTestMethod($msg, Chan $ch, Foo $foo, $optArg = self::OPT_ARG_DEFAULT) {
@@ -37,16 +45,7 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 			new Foo("bar"),
 			"hello",
 		];
-		$vos = $this->mapper->marshalForMethod($args, $this, 'myTestMethod');
-		// add in exit chan
-		$vos[] = $this->mapper->marshalArg(new Chan(null, $this->driver, $this->mapper), Chan::CLASSNAME);
-		$vos[] = false;
-
-		$topic = new TopicConfiguration("test", "default", get_class($this), "myTestMethod");
-
-		$req = new Request();
-		$req->addHeader("X-routing-key", $topic->getTopicString());
-		$req->setBody(json_encode($vos));
+		$req = $this->buildRequest($args);
 
 		// when
 		$resp = $coll->mux($req);
@@ -64,23 +63,13 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 			new Chan(null, $this->driver, $this->mapper),
 			new Foo("bar"),
 		];
+		$req = $this->buildRequest($args);
 		$expected = [
 			"hello world",
 			new Chan(null, $this->driver, $this->mapper),
 			new Foo("bar"),
 			self::OPT_ARG_DEFAULT,
 		];
-		$vos = $this->mapper->marshalForMethod($args, $this, 'myTestMethod');
-		// add in exit chan
-		$vos[] = $this->mapper->marshalArg(new Chan(null, $this->driver, $this->mapper), Chan::CLASSNAME);
-		$vos[] = false;
-
-		
-		$topic = new TopicConfiguration("test", "default", get_class($this), "myTestMethod");
-		
-		$req = new Request();
-		$req->addHeader("X-routing-key", $topic->getTopicString());
-		$req->setBody(json_encode($vos));
 
 		// when
 		$resp = $coll->mux($req);
@@ -103,15 +92,11 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 			new Chan(null, $this->driver, $this->mapper),
 			new Foo("bar"),
 		];
-		$vos = $this->mapper->marshalForMethod($args, $this, 'myTestMethod');
-		// add in exit chan
-		$vos[] = $this->mapper->marshalArg(new Chan(null, $this->driver, $this->mapper), Chan::CLASSNAME);
-		$vos[] = false;
 		
-		$topic = new TopicConfiguration("test", "default", get_class($this), "myTestMethod");
+		$req2 = $this->buildRequest($args);
 		
 		$req = new Request();
-		$req->setBody(json_encode($vos));
+		$req->setBody($req2->getBody());
 
 		// when
 		$resp = $coll->mux($req);
@@ -130,16 +115,13 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 			new Chan(null, $this->driver, $this->mapper),
 			new Foo("bar"),
 		];
-		$vos = $this->mapper->marshalForMethod($args, $this, 'myTestMethod');
-		// add in exit chan
-		$vos[] = $this->mapper->marshalArg(new Chan(null, $this->driver, $this->mapper), Chan::CLASSNAME);
-		$vos[] = false;
+		$req2 = $this->buildRequest($args);
 		
 		$topic = new TopicConfiguration("test", "default", "what", "myTestMethod");
 		
 		$req = new Request();
 		$req->addHeader("X-routing-key", $topic->getTopicString());
-		$req->setBody(json_encode($vos));
+		$req->setBody($req2->getBody());
 
 		// when
 		$resp = $coll->mux($req);
@@ -157,16 +139,13 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 			new Chan(null, $this->driver, $this->mapper),
 			new Foo("bar"),
 		];
-		$vos = $this->mapper->marshalForMethod($args, $this, 'myTestMethod');
-		// add in exit chan
-		$vos[] = $this->mapper->marshalArg(new Chan(null, $this->driver, $this->mapper), Chan::CLASSNAME);
-		$vos[] = false;
+		$req2 = $this->buildRequest($args);
 		
 		$topic = new TopicConfiguration("test", "default", get_class($this), "dne");
 		
 		$req = new Request();
 		$req->addHeader("X-routing-key", $topic->getTopicString());
-		$req->setBody(json_encode($vos));
+		$req->setBody($req2->getBody());
 
 		// when
 		$resp = $coll->mux($req);
