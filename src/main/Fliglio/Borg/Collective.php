@@ -74,7 +74,17 @@ class Collective {
 		
 		$drone = $this->lookupDrone($req->getTopic()->getType());
 
-		return $drone->handleRequest($req);
+		if ($req->getRetryErrors()) {
+			$result = $drone->handleRequest($req);
+		} else {
+			try {
+				$result = $drone->handleRequest($req);
+			} catch (\Exception $e) {
+				$req->getExitChan()->add($e->getMessage());
+			}
+		}
+		$req->getExitChan()->add(null);
+		return $result;
 	}
 
 	private function lookupDrone($type) {

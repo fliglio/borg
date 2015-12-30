@@ -34,20 +34,6 @@ trait BorgImplant {
 	 * Handle a Collective Routine request
 	 */
 	public function handleRequest(RoutineRequest $req) {
-		$result = null;
-		if ($req->getRetryErrors()) {
-			$result = $this->callRoutine($req);
-		} else {
-			try {
-				$result = $this->callRoutine($req);
-			} catch (\Exception $e) {
-				$req->getExitChan()->add($e->getMessage());
-			}
-		}
-		$req->getExitChan()->add(null);
-		return $result;
-	}
-	private function callRoutine(RoutineRequest $req) {
 		$handler = [$this, $req->getTopic()->getMethod()];
 
 		return call_user_func_array($handler, $req->getArgs());
