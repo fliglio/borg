@@ -3,6 +3,7 @@
 namespace Fliglio\Borg\Amqp;
 
 use Fliglio\Borg\Driver\ChanReaderDriver;
+use Fliglio\Borg\Chan;
 
 class AmqpChanReaderDriver implements ChanReaderDriver {
 
@@ -10,6 +11,9 @@ class AmqpChanReaderDriver implements ChanReaderDriver {
 
 	public function __construct(AmqpCollectiveDriver $factory, array $chans) {
 		foreach ($chans as $chan) {
+			if (!$chan instanceof Chan) {
+				throw new \Exception("Elements in Chan array must be of type Chan");
+			}
 			$this->drivers[] = $factory->createChan($chan->getId());
 		}
 	}

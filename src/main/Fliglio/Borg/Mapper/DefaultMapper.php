@@ -5,6 +5,10 @@ namespace Fliglio\Borg\Mapper;
 use Fliglio\Borg\Driver\CollectiveDriver;
 use Fliglio\Borg\Chan;
 use Fliglio\Borg\Driver\WireMapper;
+use Fliglio\Http\RequestReader;
+use Fliglio\Borg\RoutineRequest;
+use Fliglio\Borg\TopicConfiguration;
+use Fliglio\Flfc\Request;
 
 class DefaultMapper implements WireMapper {
 	
@@ -15,16 +19,47 @@ class DefaultMapper implements WireMapper {
 	public function __construct(CollectiveDriver $driver) {
 		$this->driver = $driver;
 	}
+	public function marshalRoutineRequest(RoutineRequest $req) {
+		$type = $req->getTopic()->getType();
+		$method = $req->getTopic()->getMethod();
 
-	private function validateParameterCount($numArgs, $numTypes, $numOpt) {
-		if (($numTypes < $numArgs) || (($numTypes - $numOpt) > $numArgs)) {
-			throw new \Exception("Wrong number of args for method signature.");
+		$vos = $this->marshalForMethod(
+			$req->getArgs(),
+			$req->getTopic()->getType(),
+			$req->getTopic()->getMethod()
+		);
+		$vos[] = $this->marshalArg($req->getExitChan(), Chan::CLASSNAME);
+		$vos[] = $req->getRetryErrors();
+
+		$r = new Request();
+		$r->addHeader('X-routing-key', $req->getTopic()->getTopicString());
+		$r->setBody(json_encode($vos));
+		
+		return $r;
+	}
+
+	public function unmarshalRoutineRequest(RequestReader $r) {
+		if (!$r->isHeaderSet("X-routing-key")) {
+			throw new \Exception("x-routing-key not set");
 		}
+		$topic = TopicConfiguration::fromTopicString($r->getHeader("X-routing-key"));
+		
+		$type = $topic->getType();
+		$method = $topic->getMethod();
+		$vos = json_decode($r->getBody(), true);
+
+		$retryErrors = array_pop($vos);
+		$exitVo = array_pop($vos);
+
+		$entities = $this->unmarshalForMethod($vos, $type, $method);
+		$exitCh = $this->unmarshalArg($exitVo, Chan::CLASSNAME);
+
+		return new RoutineRequest($topic, $entities, $exitCh, $retryErrors);
 	}
 
 	public function marshalForMethod(array $args, $inst, $method) {
 		list($types, $optionalArgs) = self::getTypesForMethod($inst, $method);
-		$this->validateParameterCount(count($args), count($types), $optionalArgs);
+		self::validateParameterCount(count($args), count($types), $optionalArgs);
 		
 		$data = [];
 		for ($i = 0; $i < count($args); $i++) {
@@ -37,7 +72,7 @@ class DefaultMapper implements WireMapper {
 
 	public function unmarshalForMethod(array $vos, $inst, $method) {
 		list($types, $optionalArgs) = self::getTypesForMethod($inst, $method);
-		$this->validateParameterCount(count($vos), count($types), $optionalArgs);
+		self::validateParameterCount(count($vos), count($types), $optionalArgs);
 
 		$argEntities = [];
 		for ($i = 0; $i < count($vos); $i++) {
@@ -101,6 +136,12 @@ class DefaultMapper implements WireMapper {
 		}
 
 		throw new \Exception($type . " can't be unmarshalled");
+	}
+
+	private static function validateParameterCount($numArgs, $numTypes, $numOpt) {
+		if (($numTypes < $numArgs) || (($numTypes - $numOpt) > $numArgs)) {
+			throw new \Exception("Wrong number of args for method signature.");
+		}
 	}
 
 	// $e is a class name or instance

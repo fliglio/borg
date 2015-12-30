@@ -75,7 +75,7 @@ class ShakespeareResource {
 
 	// Download texts and push onto chan
 	private function getTextsFromLinks(array $urls) {
-		$txts = $this->mkchan();
+		$txts = $this->coll()->mkchan();
 
 		foreach ($urls as $url) {
 			$this->coll()->generateText($url, $txts);

@@ -54,6 +54,11 @@ class TestConfiguration extends DefaultConfiguration {
 				->resource($resource, 'generateNumbersTwo')
 				->method(Http::METHOD_GET)
 				->build(),
+			RouteBuilder::get()
+				->uri('/sync')
+				->resource($resource, 'syncEx')
+				->method(Http::METHOD_GET)
+				->build(),
 
 			RouteBuilder::get()
 				->uri('/fibonacci')

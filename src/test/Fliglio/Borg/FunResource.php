@@ -12,7 +12,7 @@ class FunResource {
 
 	// recursively determine the fibonacci sequence
 	public function fibonacci(GetParam $terms) {
-		$ch = $this->mkChan();
+		$ch = $this->coll()->mkChan();
 
 		$this->coll()->fibNum($ch, 1, 1, $terms->get());
 
@@ -31,7 +31,7 @@ class FunResource {
 
 	// Gregory-Leibniz series
 	public function pi(GetParam $terms) {
-		$ch = $this->mkChan();
+		$ch = $this->coll()->mkChan();
 
 		$this->coll()->piTerm($ch, 1, $terms->get());
 
@@ -55,8 +55,8 @@ class FunResource {
 
 	// find all prime numbers up to a limit
 	public function prime(GetParam $limit) {
-		$ch = $this->mkChan();
-		$ex = $this->mkChan();
+		$ch = $this->coll()->mkChan();
+		$ex = $this->coll()->mkChan();
 
 		for ($i = 2; $i < $limit->get(); $i++) {
 			$this->collectIfPrime($ch, $ex,  $i);

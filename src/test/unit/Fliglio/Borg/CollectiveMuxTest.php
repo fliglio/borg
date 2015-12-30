@@ -38,9 +38,12 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 			"hello",
 		];
 		$vos = $this->mapper->marshalForMethod($args, $this, 'myTestMethod');
-		
+		// add in exit chan
+		$vos[] = $this->mapper->marshalArg(new Chan(null, $this->driver, $this->mapper), Chan::CLASSNAME);
+		$vos[] = false;
+
 		$topic = new TopicConfiguration("test", "default", get_class($this), "myTestMethod");
-		
+
 		$req = new Request();
 		$req->addHeader("X-routing-key", $topic->getTopicString());
 		$req->setBody(json_encode($vos));
@@ -68,6 +71,10 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 			self::OPT_ARG_DEFAULT,
 		];
 		$vos = $this->mapper->marshalForMethod($args, $this, 'myTestMethod');
+		// add in exit chan
+		$vos[] = $this->mapper->marshalArg(new Chan(null, $this->driver, $this->mapper), Chan::CLASSNAME);
+		$vos[] = false;
+
 		
 		$topic = new TopicConfiguration("test", "default", get_class($this), "myTestMethod");
 		
@@ -97,6 +104,9 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 			new Foo("bar"),
 		];
 		$vos = $this->mapper->marshalForMethod($args, $this, 'myTestMethod');
+		// add in exit chan
+		$vos[] = $this->mapper->marshalArg(new Chan(null, $this->driver, $this->mapper), Chan::CLASSNAME);
+		$vos[] = false;
 		
 		$topic = new TopicConfiguration("test", "default", get_class($this), "myTestMethod");
 		
@@ -121,6 +131,9 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 			new Foo("bar"),
 		];
 		$vos = $this->mapper->marshalForMethod($args, $this, 'myTestMethod');
+		// add in exit chan
+		$vos[] = $this->mapper->marshalArg(new Chan(null, $this->driver, $this->mapper), Chan::CLASSNAME);
+		$vos[] = false;
 		
 		$topic = new TopicConfiguration("test", "default", "what", "myTestMethod");
 		
@@ -145,6 +158,9 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 			new Foo("bar"),
 		];
 		$vos = $this->mapper->marshalForMethod($args, $this, 'myTestMethod');
+		// add in exit chan
+		$vos[] = $this->mapper->marshalArg(new Chan(null, $this->driver, $this->mapper), Chan::CLASSNAME);
+		$vos[] = false;
 		
 		$topic = new TopicConfiguration("test", "default", get_class($this), "dne");
 		

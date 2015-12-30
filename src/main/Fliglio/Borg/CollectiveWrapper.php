@@ -9,15 +9,32 @@ class CollectiveWrapper {
 	private $drone;
 	private $collective;
 	private $dc;
-
-	public function __construct($drone, Collective $c, $dc) {
-		$this->drone = $drone;
-		$this->collective = $c;
-		$this->dc = $dc;
-	}
+	private $retryErrors;
 	
 	/**
-	 * Wrap chan factory and enforce only creating in local dc
+	 * Builder Methods
+	 */
+	public function drone($drone) {
+		$this->drone = $drone;
+		return $this;
+	}
+	public function collective($c) {
+		$this->collective = $c;
+		return $this;
+	}
+	public function dc($dc) {
+		$this->dc = $dc;
+		return $this;
+	}
+	public function retryErrors($r = true) {
+		$this->retryErrors = $r;
+		return $this;
+	}
+
+
+
+	/**
+	 * Decorate mkchan call to Collective; ensure only local DC usage
 	 */
 	public function mkchan($type = null) {
 		if ($this->dc != RoutingConfiguration::DEFAULT_ROUTING_KEY) {
@@ -27,7 +44,7 @@ class CollectiveWrapper {
 	}
 
 	/**
-	 * Wrap chan reader factory and enforce only creating in local dc
+	 * Decorate mkChanReader call to Collective; ensure only local DC usage
 	 */
 	public function mkChanReader(array $chans) {
 		if ($this->dc != RoutingConfiguration::DEFAULT_ROUTING_KEY) {
@@ -36,13 +53,33 @@ class CollectiveWrapper {
 		return $this->collective->mkChanReader($chans);
 	}
 
+	/**
+	 * Decorate mkWaitGroup call to Collective; ensure only local DC usage
+	 */
+	public function mkWaitGroup(array $chans) {
+		if ($this->dc != RoutingConfiguration::DEFAULT_ROUTING_KEY) {
+			throw new \Exception("Syncing Collective Routines outside of your local datacenter isn't supported");
+		}
+		return $this->collective->mkWaitGroup($chans);
+	}
 
 	/**
 	 * Dispatch a Collective Routine async request
 	 * use the magic __call method to capture the desired method
 	 */
 	public function __call($method, array $args) {
-		$this->collective->dispatch($this->drone, $method, $args, $this->dc);
+		$topic = new TopicConfiguration(
+			$this->collective->getRoutingNamespace(),
+			$this->dc,
+			$this->drone,
+			$method
+		);
+		
+		$exitCh = $this->mkchan();
+		
+		$req = new RoutineRequest($topic, $args, $exitCh, $this->retryErrors);
+		$this->collective->dispatch($req);
+		return $exitCh;
 	}
 }
 

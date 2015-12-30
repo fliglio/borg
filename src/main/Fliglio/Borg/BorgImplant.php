@@ -5,31 +5,21 @@ namespace Fliglio\Borg;
 trait BorgImplant {
 	
 	private $collective;
-	private $availabilityZones = [];
-	private $chanFactory;
 
 	/**
 	 * run a routine in the master datacenter
 	 */
-	protected function master() {
-		return $this->az($this->collective->getMasterRoutingKey());
+	protected function master($retryErrors = false) {
+		return $this->defaultBuilder($retryErrors)
+			->dc($this->collective->getMasterRoutingKey());
 	}
 
 	/**
 	 * run a routine in your current datacenter
 	 */
-	protected function coll() {
-		return $this->az($this->collective->getLocalRoutingKey());
-	}
-
-	/**
-	 * Create a new Chan
-	 *
-	 * - only supported for local datacenter usage
-	 * - null type means a primitive (e.g. scalar or array)
-	 */
-	protected function mkchan($type = null) {
-		return $this->coll()->mkchan($type);
+	protected function coll($retryErrors = false) {
+		return $this->defaultBuilder($retryErrors)
+			->dc($this->collective->getLocalRoutingKey());
 	}
 
 	/**
@@ -40,10 +30,33 @@ trait BorgImplant {
 		$this->collective = $c;
 	}
 	
-	private function az($name) {
-		if (!isset($this->availabilityZones[$name])) {
-			$this->availabilityZones[$name] = new CollectiveWrapper($this, $this->collective, $name);
+	/**
+	 * Handle a Collective Routine request
+	 */
+	public function handleRequest(RoutineRequest $req) {
+		$result = null;
+		if ($req->getRetryErrors()) {
+			$result = $this->callRoutine($req);
+		} else {
+			try {
+				$result = $this->callRoutine($req);
+			} catch (\Exception $e) {
+				$req->getExitChan()->add($e->getMessage());
+			}
 		}
-		return $this->availabilityZones[$name];
+		$req->getExitChan()->add(null);
+		return $result;
+	}
+	private function callRoutine(RoutineRequest $req) {
+		$handler = [$this, $req->getTopic()->getMethod()];
+
+		return call_user_func_array($handler, $req->getArgs());
+	}
+
+	private function defaultBuilder($retryErrors) {
+		return (new CollectiveWrapper)
+			->drone($this)
+			->collective($this->collective)
+			->retryErrors($retryErrors);
 	}
 }

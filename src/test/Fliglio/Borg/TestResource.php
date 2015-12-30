@@ -12,7 +12,7 @@ class TestResource {
 
 	// basic round trip
 	public function roundTrip(GetParam $msg) {
-		$ch = $this->mkChan();
+		$ch = $this->coll()->mkChan();
 		$this->coll()->worldAdder($msg->get(), $ch);
 
 		return $ch->get();
@@ -23,8 +23,8 @@ class TestResource {
 
 	// use a chan of type chan
 	public function chanChan(GetParam $msg) {
-		$exit = $this->mkChan();
-		$ch = $this->mkChan(Chan::CLASSNAME);
+		$exit = $this->coll()->mkChan();
+		$ch = $this->coll()->mkChan(Chan::CLASSNAME);
 		$this->coll()->chanAdder($ch, $exit);
 	
 		$ch2 = $ch->get();
@@ -33,7 +33,7 @@ class TestResource {
 		return $exit->get();
 	}
 	public function chanAdder(Chan $ch, Chan $exit) {
-		$ch2 = $this->mkChan();
+		$ch2 = $this->coll()->mkChan();
 		$ch->add($ch2);
 		
 		$exit->add($ch2->get() . " world");
@@ -41,8 +41,8 @@ class TestResource {
 
 	// test ChanReader
 	public function generateNumbers(GetParam $limit) {
-		$ch = $this->mkChan();
-		$ex = $this->mkChan();
+		$ch = $this->coll()->mkChan();
+		$ex = $this->coll()->mkChan();
 
 		$this->coll()->gen($ch, $ex, $limit->get());
 		
@@ -70,7 +70,7 @@ class TestResource {
 	
 	// test Passing null
 	public function generateNumbersTwo(GetParam $limit) {
-		$ch = $this->mkChan();
+		$ch = $this->coll()->mkChan();
 
 		$this->coll()->genTwo($ch, $limit->get());
 		
@@ -90,4 +90,27 @@ class TestResource {
 		}
 		$ch->add(null);
 	}
+
+	public function syncEx(GetParam $fail) {
+		$shouldFail = $fail->get() == 'true';
+
+		$jobs = [];
+		for ($i = 0; $i < 5; $i++) {
+			$jobs[] = $this->coll()->simWork($shouldFail);
+		}
+
+		try {
+			$this->coll()->mkWaitGroup($jobs)->wait();
+			return true;
+		} catch (\Exception $e) {
+			return false;
+		}
+	}
+	public function simWork($fail) {
+		if ($fail) {
+			throw new \Exception('inducing failure');
+		}
+	}
+
+
 }

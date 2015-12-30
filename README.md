@@ -25,6 +25,11 @@ And now you can too.
 
 - support sending `null` to Chans and Collective Routines
 	- make match typical php behavior ([see here](http://artur.ejsmont.org/blog/content/php-typehints-causing-errors-when-null-gets-passed-in))
+- add `sync` concept
+	- have collective routine dispatch return an exit `Chan`
+	- each collective routine sends `null` of an exception on this `Chan`
+	- the main process calls `sync` passing in an array of exit chans; this blocks until all have returned a value. 
+	  If the value is an exception, it will be rethrown.
 
 #### Other
 

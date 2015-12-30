@@ -8,6 +8,8 @@ use PhpAmqpLib\Message\AMQPMessage;
 use Fliglio\Borg\Driver\CollectiveDriver;
 use Fliglio\Borg\Chan;
 
+use Fliglio\Http\RequestReader;
+
 class AmqpCollectiveDriver implements CollectiveDriver {
 
 	const EXCHANGE = "borg";
@@ -41,14 +43,17 @@ class AmqpCollectiveDriver implements CollectiveDriver {
 	/**
 	 *  Publish args with a routing_key containing routing details to exchange
 	 */
-	public function go($routingKey, array $data) {
+	public function go(RequestReader $req) {
 		
 		$ch = $this->getChannel();
 		
-		$msg = new AMQPMessage(json_encode($data), array('content_type' => 'application/json'));
+		$msg = new AMQPMessage($req->getBody(), array('content_type' => 'application/json'));
 
 
-		$ch->basic_publish($msg, self::EXCHANGE, $routingKey);
+		if (!$req->isHeaderSet("X-routing-key")) {
+			throw new \Exception("x-routing-key not set");
+		}
+		$ch->basic_publish($msg, self::EXCHANGE, $req->getHeader('X-routing-key'));
 	}
 
 	/**
