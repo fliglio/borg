@@ -22,12 +22,14 @@ class TestConfiguration extends DefaultConfiguration {
 	
 		$resource = new TestResource();
 		$fun = new FunResource;
+		$shake = new ShakespeareResource;
 		
 		$mapper = new DefaultMapper($driver);
 		$routing = new RoutingConfiguration("borg-demo");
 		$coll = new Collective($driver, $mapper, $routing);
 		$coll->assimilate($resource);
 		$coll->assimilate($fun);
+		$coll->assimilate($shake);
 
 
 
@@ -69,6 +71,17 @@ class TestConfiguration extends DefaultConfiguration {
 				->method(Http::METHOD_GET)
 				->build(),
 		
+			RouteBuilder::get()
+				->uri('/shakespeare/words')
+				->resource($shake, 'allWords')
+				->method(Http::METHOD_GET)
+				->build(),
+			RouteBuilder::get()
+				->uri('/shakespeare/words-sync')
+				->resource($shake, 'allWordsSync')
+				->method(Http::METHOD_GET)
+				->build(),
+					
 			// Router for all Borg Collective calls
 			RouteBuilder::get()
 				->uri('/borg')

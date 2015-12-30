@@ -9,5 +9,5 @@ endpoints:
       topicname: "borg-demo.default.#"
       queuename: borg
       exchangename: borg
-      prefetch: 5
+      prefetch: 30
 

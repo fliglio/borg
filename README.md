@@ -73,3 +73,50 @@ sending a `null` to `$ch` to signal that the work is done.
 		
 		$ex->add(true);
 	}
+
+
+
+# local shakespeare
+
+	$this->urlsd = [
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-alls-11.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-antony-23.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-as-12.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-comedy-7.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-coriolanus-24.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-cymbeline-17.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-first-51.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-hamlet-25.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-julius-26.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-king-45.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-life-54.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-life-55.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-life-56.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-lovers-62.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-loves-8.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-macbeth-46.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-measure-13.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-merchant-5.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-merry-15.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-midsummer-16.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-much-3.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-othello-47.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-pericles-21.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-rape-61.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-romeo-48.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-second-52.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-sonnets-59.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-taming-2.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-tempest-4.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-third-53.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-timon-49.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-titus-50.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-tragedy-57.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-tragedy-58.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-troilus-22.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-twelfth-20.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-two-18.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-venus-60.txt',
+		__DIR__ . '/../../../../shakespeare-txt/shakespeare-winters-19.txt',
+		__DIR__ . '/../../../../shakespeare-txt/sonnets.txt',
+	];

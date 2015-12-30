@@ -19,7 +19,7 @@ class CollectiveWrapper {
 	/**
 	 * Wrap chan factory and enforce only creating in local dc
 	 */
-	public function mkchan($type) {
+	public function mkchan($type = null) {
 		if ($this->dc != RoutingConfiguration::DEFAULT_ROUTING_KEY) {
 			throw new \Exception("Making Chans outside of your local datacenter isn't supported");
 		}
