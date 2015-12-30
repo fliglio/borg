@@ -7,7 +7,7 @@ use Fliglio\Borg\Test\MockCollectiveDriverFactory;
 use Fliglio\Borg\RoutineRequest;
 use Fliglio\Borg\TopicConfiguration;
 
-class DefaultMapperForMethodTest extends \PHPUnit_Framework_TestCase {
+class DefaultMapperRequestTest extends \PHPUnit_Framework_TestCase {
 	private $driver;
 	private $mapper;
 	private $ex;
