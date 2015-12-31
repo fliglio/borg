@@ -19,7 +19,7 @@ trait BorgImplant {
 	 * (used by the framework, don't use directly)
 	 */
 	public function handleRequest(RoutineRequest $req) {
-		$handler = [$this, $req->getTopic()->getMethod()];
+		$handler = [$this, $req->getMethod()];
 
 		return call_user_func_array($handler, $req->getArgs());
 	}

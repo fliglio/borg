@@ -2,25 +2,38 @@
 
 namespace Fliglio\Borg;
 
-use Fliglio\Http\RequestReader;
-use Fliglio\Borg\Driver\WireMapper;
-
 class RoutineRequest {
 
-	private $topic;
+	private $ns;
+	private $dc;
+	private $type;
+	private $method;
+	
 	private $args;
 	private $exitCh;
 	private $retryErrors;
 
-	public function __construct(TopicConfiguration $topic, array $args, $exitCh, $retryErrors) {
-		$this->topic = $topic;
+	public function __construct($ns, $dc, $type, $method, array $args = [], Chan $exitCh = null, $retryErrors = false) {
+		$this->ns = $this->validate($ns);
+		$this->dc = $this->validate($dc);
+		$this->type = $this->validate($type);
+		$this->method = $this->validate($method);
 		$this->args = $args;
 		$this->exitCh = $exitCh;
 		$this->retryErrors = $retryErrors;
 	}
 
-	public function getTopic() {
-		return $this->topic;
+	public function getNs() {
+		return $this->ns;
+	}
+	public function getDc() {
+		return $this->dc;
+	}
+	public function getType() {
+		return $this->type;
+	}
+	public function getMethod() {
+		return $this->method;
 	}
 	public function getArgs() {
 		return $this->args;
@@ -30,5 +43,12 @@ class RoutineRequest {
 	}
 	public function getRetryErrors() {
 		return $this->retryErrors;
+	}
+
+	private function validate($str) {
+		if (strpos($str, '.') !== false) {
+			throw new \Exception(sprintf("Request component cannot have '.': '%s'", $str));
+		}
+		return $str;
 	}
 }

@@ -22,10 +22,20 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 		$this->mapper = new DefaultMapper($this->driver);
 		
 	}
-	private function buildRequest(array $entities) {
-		$topic = new TopicConfiguration('foo', 'bar', $this, 'myTestMethod');
+	private function buildRoutineRequest(array $args, $method) {
 		$ex = new Chan(null, $this->driver, $this->mapper);
-		$r = new RoutineRequest($topic, $entities, $ex, false);
+		return (new RoutineRequestBuilder())
+			->ns('foo')
+			->dc('bar')
+			->type(get_class($this))
+			->method($method)
+			->args($args)
+			->exitChan($ex)
+			->retryErrors(false)
+			->build();
+	}
+	private function buildRequest(array $entities) {
+		$r = $this->buildRoutineRequest($entities, 'myTestMethod');
 
 		return $this->mapper->marshalRoutineRequest($r);
 	}
@@ -103,6 +113,7 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 	}
 	
 	/**
+	 * @todo this is failing for the wrong reason
 	 * @expectedException \Exception
 	 */
 	public function testMuxRoutingKeyBadDrone() {
@@ -117,7 +128,7 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 		];
 		$req2 = $this->buildRequest($args);
 		
-		$topic = new TopicConfiguration("test", "default", "what", "myTestMethod");
+		//$topic = new TopicConfiguration("test", "default", "what", "myTestMethod");
 		
 		$req = new Request();
 		$req->addHeader("X-routing-key", $topic->getTopicString());
@@ -127,6 +138,7 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 		$resp = $coll->mux($req);
 	}
 	/**
+	 * @todo this is failing for the wrong reason
 	 * @expectedException \Exception
 	 */
 	public function testMuxRoutingKeyBadMethod() {
@@ -141,7 +153,7 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 		];
 		$req2 = $this->buildRequest($args);
 		
-		$topic = new TopicConfiguration("test", "default", get_class($this), "dne");
+		//$topic = new TopicConfiguration("test", "default", get_class($this), "dne");
 		
 		$req = new Request();
 		$req->addHeader("X-routing-key", $topic->getTopicString());

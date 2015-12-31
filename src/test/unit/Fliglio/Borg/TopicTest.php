@@ -1,90 +1,94 @@
 <?php
 namespace Fliglio\Borg;
 
+use Fliglio\Flfc\Request;
+use Fliglio\Borg\Mapper\DefaultMapper;
+use Fliglio\Borg\Test\MockCollectiveDriverFactory;
 
 class TopicTest extends \PHPUnit_Framework_TestCase {
 
+	private $driver;
+	private $mapper;
 
 	public function setup() {
+		$this->driver = MockCollectiveDriverFactory::get();
+		$this->mapper = new DefaultMapper($this->driver);
+	}
+	private function buildRequest($ns, $dc, $type, $method) {
+		$ex = new Chan(null, $this->driver, $this->mapper);
+		return (new RoutineRequestBuilder())
+			->ns($ns)
+			->dc($dc)
+			->type($type)
+			->method($method)
+			->args([])
+			->exitChan($ex)
+			->retryErrors(false)
+			->build();
 	}
 
 	public function testTopic() {
 		// given
-		$cfg = new TopicConfiguration('foo', 'bar', 'baz', 'testTopic');
-		$expected = 'foo.bar.baz.testTopic';
-
-		// when
-		$str = $cfg->getTopicString();
-
-		// then
-		$this->assertEquals($expected, $str, 'topic config should build expected string');
-	}
-
-	public function testTopicWithInstance() {
-		// given
-		$cfg = new TopicConfiguration('foo', 'bar', 'Fliglio\Borg\TopicTest', 'testTopic');
+		$req = $this->buildRequest('foo', 'bar', 'Fliglio\Borg\TopicTest', 'testTopic');
 		$expected = 'foo.bar.Fliglio.Borg.TopicTest.testTopic';
 
 		// when
-		$instCfg = new TopicConfiguration('foo', 'bar', $this, 'testTopic');
+		$r = $this->mapper->marshalRoutineRequest($req);
 
 		// then
-		$this->assertEquals($cfg, $instCfg, 'constructing with classname or instance should build same object');
-		$this->assertEquals($expected, $cfg->getTopicString(), 'topic config should build expected string');
-		$this->assertEquals($expected, $instCfg->getTopicString(), 'topic config should build expected string');
+		$this->assertEquals($expected, $r->getHeader('X-routing-key'), 'topic config should build expected string');
 	}
+
 
 	public function testTopicFromString() {
 		// given
-		$expected = new TopicConfiguration('foo', 'bar', 'baz', 'testTopic');
-		$topicStr = 'foo.bar.baz.testTopic';
+		$x = $this->buildRequest('', '', 'Fliglio\Borg\TopicTest', 'testTopic');
+		$x2 = $this->mapper->marshalRoutineRequest($x);
+
+		$req = new Request();
+		$req->addHeader("X-routing-key", 'foo.bar.Fliglio.Borg.TopicTest.testTopic');
+		$req->setBody($x2->getBody());
 
 		// when
-		$cfg = TopicConfiguration::fromTopicString($topicStr);
+		$found = $this->mapper->unmarshalRoutineRequest($req);
 
 		// then
-		$this->assertEquals($expected, $cfg, 'topic configs should match');
+		$this->assertEquals('foo', $found->getNs(), 'should match');
+		$this->assertEquals('bar', $found->getDc(), 'should match');
+		$this->assertEquals('Fliglio\Borg\TopicTest', $found->getType(), 'should match');
+		$this->assertEquals('testTopic', $found->getMethod(), 'should match');
 	}
 
-	public function testTopicToAndFromShouldBeSymmetrical() {
-		// given
-		$cfg = new TopicConfiguration('foo', 'bar', 'baz', 'testTopic');
-
-		// when
-		$topicStr = $cfg->getTopicString();
-		$cfg2 = TopicConfiguration::fromTopicString($topicStr);
-
-		// then
-		$this->assertEquals($cfg, $cfg2, 'topic configs should match');
-	}
 	
 	/**
 	 * @expectedException \Exception
 	 */
 	public function testBadTopicComponentNs() {
 		// when
-		new TopicConfiguration('fo.o', 'bar', 'Fliglio\Borg\TopicTest', 'testTopic');
+		$req = $this->buildRequest('fo.o', 'bar', 'Fliglio\Borg\TopicTest', 'testTopic');
 	}
 	/**
 	 * @expectedException \Exception
 	 */
 	public function testBadTopicComponentDc() {
 		// when
-		new TopicConfiguration('foo', 'ba.r', 'Fliglio\Borg\TopicTest', 'testTopic');
+		$req = $this->buildRequest('foo', 'ba.r', 'Fliglio\Borg\TopicTest', 'testTopic');
 	}
 	/**
 	 * @expectedException \Exception
 	 */
 	public function testBadTopicComponentType() {
 		// when
-		new TopicConfiguration('foo', 'bar', 'Fliglio\Borg\Topic.Test', 'testTopic');
+		$req = $this->buildRequest('foo', 'ba.r', 'Fliglio\Borg\Notaclass', 'testTopic');
+		$this->mapper->marshalRoutineRequest($req);
 	}
 	/**
 	 * @expectedException \Exception
 	 */
 	public function testBadTopicComponentMethod() {
 		// when
-		new TopicConfiguration('foo', 'bar', 'Fliglio\Borg\TopicTest', 'test.Topic');
+		$req = $this->buildRequest('foo', 'ba.r', 'Fliglio\Borg\TopicTest', 'notamethod');
+		$this->mapper->marshalRoutineRequest($req);
 	}
 
 }

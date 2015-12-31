@@ -5,24 +5,33 @@ use Fliglio\Borg\Chan;
 use Fliglio\Borg\Api\Foo;
 use Fliglio\Borg\Test\MockCollectiveDriverFactory;
 use Fliglio\Borg\RoutineRequest;
-use Fliglio\Borg\TopicConfiguration;
+use Fliglio\Borg\RoutineRequestBuilder;
 
 class DefaultMapperRequestTest extends \PHPUnit_Framework_TestCase {
 	private $driver;
 	private $mapper;
-	private $ex;
 
 	public function setup() {
 		$this->driver = MockCollectiveDriverFactory::get();
 		$this->mapper = new DefaultMapper($this->driver);
-		$this->ex = new Chan(null, $this->driver, $this->mapper);
 	}
-
+	private function buildRequest(array $args, $method) {
+		$ex = new Chan(null, $this->driver, $this->mapper);
+		return (new RoutineRequestBuilder())
+			->ns('foo')
+			->dc('bar')
+			->type(get_class($this))
+			->method($method)
+			->args($args)
+			->exitChan($ex)
+			->retryErrors(false)
+			->build();
+	}
+	
 	public function StubCollectiveRoutineMethod($prim, Chan $ch, Foo $foo, $optionalArg = null) {}
-	public function StubCollectiveRoutineMethod2(Chan $ch, Foo $foo, $prim) {}
-	public function testMarshalRequest() {
+		
+		public function testMarshalRequest() {
 		// given
-		$topic = new TopicConfiguration('foo', 'bar', $this, 'StubCollectiveRoutineMethod');
 		$entities = [
 			"hello world",
 			new Chan(null, $this->driver, $this->mapper),
@@ -30,7 +39,7 @@ class DefaultMapperRequestTest extends \PHPUnit_Framework_TestCase {
 			123,
 		];
 		
-		$req = new RoutineRequest($topic, $entities, $this->ex, false);
+		$req = $this->buildRequest($entities, 'StubCollectiveRoutineMethod');
 
 		// when
 		$r = $this->mapper->marshalRoutineRequest($req);
@@ -41,13 +50,12 @@ class DefaultMapperRequestTest extends \PHPUnit_Framework_TestCase {
 	}
 	public function testMarshalRequestWithDefaults() {
 		// given
-		$topic = new TopicConfiguration('foo', 'bar', $this, 'StubCollectiveRoutineMethod');
 		$entities = [
 			"hello world",
 			new Chan(null, $this->driver, $this->mapper),
 			new Foo("bar"),
 		];
-		$req = new RoutineRequest($topic, $entities, $this->ex, false);
+		$req = $this->buildRequest($entities, 'StubCollectiveRoutineMethod');
 
 		// when
 		$r = $this->mapper->marshalRoutineRequest($req);
@@ -62,7 +70,6 @@ class DefaultMapperRequestTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testMarshalWrongTypes() {
 		// given
-		$topic = new TopicConfiguration('foo', 'bar', $this, 'StubCollectiveRoutineMethod');
 		$entities = [
 			"hello world",
 			"hello world",
@@ -70,7 +77,7 @@ class DefaultMapperRequestTest extends \PHPUnit_Framework_TestCase {
 			"hello world",
 		];
 
-		$req = new RoutineRequest($topic, $entities, $this->ex, false);
+		$req = $this->buildRequest($entities, 'StubCollectiveRoutineMethod');
 
 		// when
 		$r = $this->mapper->marshalRoutineRequest($req);

@@ -7,7 +7,7 @@ use Fliglio\Borg\Chan;
 use Fliglio\Borg\Driver\WireMapper;
 use Fliglio\Http\RequestReader;
 use Fliglio\Borg\RoutineRequest;
-use Fliglio\Borg\TopicConfiguration;
+use Fliglio\Borg\RoutineRequestBuilder;
 use Fliglio\Flfc\Request;
 
 class DefaultMapper implements WireMapper {
@@ -20,19 +20,21 @@ class DefaultMapper implements WireMapper {
 		$this->driver = $driver;
 	}
 	public function marshalRoutineRequest(RoutineRequest $req) {
-		$type = $req->getTopic()->getType();
-		$method = $req->getTopic()->getMethod();
+		$type = $req->getType();
+		$method = $req->getMethod();
 
 		$vos = $this->marshalForMethod(
 			$req->getArgs(),
-			$req->getTopic()->getType(),
-			$req->getTopic()->getMethod()
+			$req->getType(),
+			$req->getMethod()
 		);
 		$vos[] = $this->marshalArg($req->getExitChan(), Chan::CLASSNAME);
 		$vos[] = $req->getRetryErrors();
 
+		$topicStr = $this->marshalTopicString($req->getNs(), $req->getDc(), $req->getType(), $req->getMethod());
+
 		$r = new Request();
-		$r->addHeader('X-routing-key', $req->getTopic()->getTopicString());
+		$r->addHeader('X-routing-key', $topicStr);
 		$r->setBody(json_encode($vos));
 		
 		return $r;
@@ -42,19 +44,39 @@ class DefaultMapper implements WireMapper {
 		if (!$r->isHeaderSet("X-routing-key")) {
 			throw new \Exception("x-routing-key not set");
 		}
-		$topic = TopicConfiguration::fromTopicString($r->getHeader("X-routing-key"));
-		
-		$type = $topic->getType();
-		$method = $topic->getMethod();
+		list($ns, $dc, $type, $method) = $this->unmarshalTopicString($r->getHeader('X-routing-key'));
+
 		$vos = json_decode($r->getBody(), true);
 
 		$retryErrors = array_pop($vos);
 		$exitVo = array_pop($vos);
-
-		$entities = $this->unmarshalForMethod($vos, $type, $method);
 		$exitCh = $this->unmarshalArg($exitVo, Chan::CLASSNAME);
+		$entities = $this->unmarshalForMethod($vos, $type, $method);
 
-		return new RoutineRequest($topic, $entities, $exitCh, $retryErrors);
+		return (new RoutineRequestBuilder())
+			->ns($ns)
+			->dc($dc)
+			->type($type)
+			->method($method)
+			->args($entities)
+			->exitChan($exitCh)
+			->retryErrors($retryErrors)
+			->build();
+	}
+
+	private function marshalTopicString($ns, $dc, $type, $method) {
+		$topicClass = str_replace("\\", ".", $type);
+		return $ns . '.' . $dc . '.' . $topicClass . '.' . $method;
+	}
+	private function unmarshalTopicString($str) {
+		$parts = explode(".", $str);
+
+		$method = array_pop($parts);
+		$ns = array_shift($parts);
+		$dc = array_shift($parts);
+		$type = implode("\\", $parts);
+
+		return [$ns, $dc, $type, $method];
 	}
 
 	private function marshalForMethod(array $args, $inst, $method) {

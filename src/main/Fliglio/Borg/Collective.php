@@ -72,7 +72,7 @@ class Collective {
 	public function mux(RequestReader $r) {
 		$req = $this->mapper->unmarshalRoutineRequest($r);
 		
-		$drone = $this->lookupDrone($req->getTopic()->getType());
+		$drone = $this->lookupDrone($req->getType());
 
 		if ($req->getRetryErrors()) {
 			$result = $drone->handleRequest($req);
