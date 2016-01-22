@@ -24,8 +24,8 @@ class FunResource {
 	}
 	public function fibNum(Chan $ch, $a, $b, $terms) {
 		$ch->add($a);
-		if ($terms <= 10) {
-			$this->coll()->fibNum($ch, $b, $a+$b, $terms--);
+		if ((int)$terms > 0) {
+			$this->coll()->fibNum($ch, $b, $a+$b, --$terms);
 		}
 	}
 
@@ -85,10 +85,9 @@ class FunResource {
 				return;
 			}
 		}
-		
+
 		$ch->add($n);
 		$ex->add(true);
 	}
 
 }
-
