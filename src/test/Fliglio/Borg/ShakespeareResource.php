@@ -9,7 +9,7 @@ use Fliglio\Borg\BorgImplant;
 
 class ShakespeareResource {
 	use BorgImplant;
-	
+
 	private $urls = [
 		'https://raw.githubusercontent.com/benschw/shakespeare-txt/master/shakespeare-alls-11.txt',
 		'https://raw.githubusercontent.com/benschw/shakespeare-txt/master/shakespeare-antony-23.txt',
@@ -59,7 +59,7 @@ class ShakespeareResource {
 		foreach ($this->urls as $url) {
 			$txt = $this->downloadUrl($url);
 			$arr = $this->misspellingsOnly($this->toWords($this->removePunctuation($txt)));
-			
+
 			$words = array_merge($words, $arr);
 		}
 		return $words;
@@ -91,7 +91,7 @@ class ShakespeareResource {
 		$words = $this->coll()->mkchan();
 
 		$this->coll()->generateWords($txts, $words, $numTxts);
-		
+
 		return $words;
 	}
 	public function generateWords(Chan $txts, Chan $words, $numTxts) {
@@ -100,7 +100,7 @@ class ShakespeareResource {
 			$txt = $txts->get();
 
 			$arr = $this->misspellingsOnly($this->toWords($this->removePunctuation($txt)));
-			
+
 			$words->add($arr);
 		}
 	}
