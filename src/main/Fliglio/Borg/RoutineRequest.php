@@ -10,16 +10,14 @@ class RoutineRequest {
 	private $method;
 	
 	private $args;
-	private $exitCh;
 	private $retryErrors;
 
-	public function __construct($ns, $dc, $type, $method, array $args = [], Chan $exitCh = null, $retryErrors = false) {
+	public function __construct($ns, $dc, $type, $method, array $args = [], $retryErrors = false) {
 		$this->ns = $this->validate($ns);
 		$this->dc = $this->validate($dc);
 		$this->type = $this->validate($type);
 		$this->method = $this->validate($method);
 		$this->args = $args;
-		$this->exitCh = $exitCh;
 		$this->retryErrors = $retryErrors;
 	}
 
@@ -37,9 +35,6 @@ class RoutineRequest {
 	}
 	public function getArgs() {
 		return $this->args;
-	}
-	public function getExitChan() {
-		return $this->exitCh;
 	}
 	public function getRetryErrors() {
 		return $this->retryErrors;

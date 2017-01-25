@@ -91,26 +91,6 @@ class TestResource {
 		$ch->add(null);
 	}
 
-	public function syncEx(GetParam $fail) {
-		$shouldFail = $fail->get() == 'true';
-
-		$jobs = [];
-		for ($i = 0; $i < 5; $i++) {
-			$jobs[] = $this->coll()->simWork($shouldFail);
-		}
-
-		try {
-			$this->coll()->mkWaitGroup($jobs)->wait();
-			return true;
-		} catch (\Exception $e) {
-			return false;
-		}
-	}
-	public function simWork($fail) {
-		if ($fail) {
-			throw new \Exception('inducing failure');
-		}
-	}
 
 
 }

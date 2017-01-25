@@ -15,14 +15,12 @@ class TopicTest extends \PHPUnit_Framework_TestCase {
 		$this->mapper = new DefaultMapper($this->driver);
 	}
 	private function buildRequest($ns, $dc, $type, $method) {
-		$ex = new Chan(null, $this->driver, $this->mapper);
 		return (new RoutineRequestBuilder())
 			->ns($ns)
 			->dc($dc)
 			->type($type)
 			->method($method)
 			->args([])
-			->exitChan($ex)
 			->retryErrors(false)
 			->build();
 	}

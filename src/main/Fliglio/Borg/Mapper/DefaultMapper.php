@@ -28,7 +28,6 @@ class DefaultMapper implements WireMapper {
 			$req->getType(),
 			$req->getMethod()
 		);
-		$vos[] = $this->marshalArg($req->getExitChan(), Chan::CLASSNAME);
 		$vos[] = $req->getRetryErrors();
 
 		$topicStr = $this->marshalTopicString($req->getNs(), $req->getDc(), $req->getType(), $req->getMethod());
@@ -49,8 +48,6 @@ class DefaultMapper implements WireMapper {
 		$vos = json_decode($r->getBody(), true);
 
 		$retryErrors = array_pop($vos);
-		$exitVo = array_pop($vos);
-		$exitCh = $this->unmarshalArg($exitVo, Chan::CLASSNAME);
 		$entities = $this->unmarshalForMethod($vos, $type, $method);
 
 		return (new RoutineRequestBuilder())
@@ -59,7 +56,6 @@ class DefaultMapper implements WireMapper {
 			->type($type)
 			->method($method)
 			->args($entities)
-			->exitChan($exitCh)
 			->retryErrors($retryErrors)
 			->build();
 	}

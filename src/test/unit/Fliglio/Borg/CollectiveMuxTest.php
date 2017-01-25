@@ -23,14 +23,12 @@ class CollectiveMux extends \PHPUnit_Framework_TestCase {
 		
 	}
 	private function buildRoutineRequest(array $args, $method) {
-		$ex = new Chan(null, $this->driver, $this->mapper);
 		return (new RoutineRequestBuilder())
 			->ns('foo')
 			->dc('bar')
 			->type(get_class($this))
 			->method($method)
 			->args($args)
-			->exitChan($ex)
 			->retryErrors(false)
 			->build();
 	}
