@@ -10,7 +10,6 @@ class RoutineRequestBuilder {
 	private $method;
 	
 	private $args = [];
-	private $exitCh;
 	private $retryErrors;
 
 	public function ns($ns) {
@@ -33,10 +32,6 @@ class RoutineRequestBuilder {
 		$this->args = $args;
 		return $this;
 	}
-	public function exitChan(Chan $ex) {
-		$this->exitCh = $ex;
-		return $this;
-	}
 	public function retryErrors($r) {
 		$this->retryErrors = $r;
 		return $this;
@@ -49,7 +44,6 @@ class RoutineRequestBuilder {
 			$this->type,
 			$this->method,
 			$this->args,
-			$this->exitCh,
 			$this->retryErrors
 		);
 	}

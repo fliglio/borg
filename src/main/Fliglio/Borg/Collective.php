@@ -52,10 +52,6 @@ class Collective {
 		return new ChanReader($this->driver, $this->mapper, $chans);
 	}
 	
-	public function mkWaitGroup(array $chans) {
-		return new WaitGroup($this->mkChanReader($chans), count($chans));
-	}
-
 	/**
 	 * Call a collective routine
 	 */
@@ -74,16 +70,17 @@ class Collective {
 		
 		$drone = $this->lookupDrone($req->getType());
 
+		$result = null;
 		if ($req->getRetryErrors()) {
 			$result = $drone->handleRequest($req);
 		} else {
 			try {
 				$result = $drone->handleRequest($req);
 			} catch (\Exception $e) {
-				$req->getExitChan()->add($e->getMessage());
+
+				error_log("Borg Routine Error: ".$e->getMessage());
 			}
 		}
-		$req->getExitChan()->add(null);
 		return $result;
 	}
 

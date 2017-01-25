@@ -16,14 +16,12 @@ class DefaultMapperRequestTest extends \PHPUnit_Framework_TestCase {
 		$this->mapper = new DefaultMapper($this->driver);
 	}
 	private function buildRequest(array $args, $method) {
-		$ex = new Chan(null, $this->driver, $this->mapper);
 		return (new RoutineRequestBuilder())
 			->ns('foo')
 			->dc('bar')
 			->type(get_class($this))
 			->method($method)
 			->args($args)
-			->exitChan($ex)
 			->retryErrors(false)
 			->build();
 	}

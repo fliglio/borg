@@ -68,19 +68,17 @@ class CollectiveWrapper {
 	 * use the magic __call method to capture the desired method
 	 */
 	public function __call($method, array $args) {
-		$exitCh = $this->mkchan();
 		$req = (new RoutineRequestBuilder())
 			->ns($this->collective->getRoutingNamespace())
 			->dc($this->dc)
 			->type(get_class($this->drone))
 			->method($method)
 			->args($args)
-			->exitChan($exitCh)
 			->retryErrors($this->retryErrors)
 			->build();
 			
 		$this->collective->dispatch($req);
-		return $exitCh;
+		return;
 	}
 }
 

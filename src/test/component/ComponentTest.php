@@ -56,24 +56,4 @@ class ComponentTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals($expected, $resp->json());
 	}
 	
-	public function testSync() {
-		// given
-		$expected = true;
-
-		// when
-		$resp = $this->client->get($this->add."/sync?fail=false");
-	
-		// then
-		$this->assertEquals($expected, $resp->json());
-	}
-	public function testSyncFailure() {
-		// given
-		$expected = false;
-
-		// when
-		$resp = $this->client->get($this->add."/sync?fail=true");
-	
-		// then
-		$this->assertEquals($expected, $resp->json());
-	}
 }
