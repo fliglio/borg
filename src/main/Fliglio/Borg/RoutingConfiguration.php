@@ -17,12 +17,13 @@ namespace Fliglio\Borg;
 class RoutingConfiguration {
 	
 	const DEFAULT_ROUTING_KEY = 'default';
+	const MASTER_ROUTING_KEY = 'master';
 
 	private $ns;
 	private $localRoutingKey;
 	private $masterRoutingKey;
 
-	public function __construct($ns, $localRoutingKey = self::DEFAULT_ROUTING_KEY, $masterRoutingKey = self::DEFAULT_ROUTING_KEY) {
+	public function __construct($ns, $localRoutingKey = self::DEFAULT_ROUTING_KEY, $masterRoutingKey = self::MASTER_ROUTING_KEY) {
 		$this->ns = $ns;
 		$this->localRoutingKey = $localRoutingKey;
 		$this->masterRoutingKey = $masterRoutingKey;
