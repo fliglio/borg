@@ -15,7 +15,7 @@ class MockCollectiveDriverFactory extends \PHPUnit_Framework_TestCase {
 		return self::$driver;
 	}
 
-	private function create() {
+	public function create() {
 		$driver = $this->getMockBuilder('\Fliglio\Borg\Amqp\AmqpCollectiveDriver')
 			->disableOriginalConstructor()
 			->getMock();
