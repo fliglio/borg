@@ -44,4 +44,8 @@ class MockCollectiveDriverFactory extends \PHPUnit_Framework_TestCase {
 			}));
 		return $driver;
 	}
+
+	public static function reset() {
+		self::$driver = null;
+	}
 }
