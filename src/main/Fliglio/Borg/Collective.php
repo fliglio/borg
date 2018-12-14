@@ -78,7 +78,8 @@ class Collective {
 				$result = $drone->handleRequest($req);
 			} catch (\Exception $e) {
 
-				error_log("Borg Routine Error: ".$e->getMessage());
+				error_log("Borg Routine Error, process will not be retried");
+				error_log($e);
 			}
 		}
 		return $result;
