@@ -72,13 +72,27 @@ class Collective {
 
 		$result = null;
 		if ($req->getRetryErrors()) {
-			$result = $drone->handleRequest($req);
+			try {
+				$result = $drone->handleRequest($req);
+			} catch (\Exception $e) {
+				
+				error_log(sprintf(
+					"Borg Routine Error: process will be retried. %s->%s",
+					$req->getType(), $req->getMethod()
+				));
+				throw $e;
+			}
+
 		} else {
 			try {
 				$result = $drone->handleRequest($req);
 			} catch (\Exception $e) {
 
-				error_log("Borg Routine Error: ".$e->getMessage());
+				error_log(sprintf(
+					"Borg Routine Error: process will not be retried. %s->%s",
+					$req->getType(), $req->getMethod()
+				));
+				error_log($e);
 			}
 		}
 		return $result;
