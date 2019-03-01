@@ -48,7 +48,7 @@ component-test-setup:
 	@sleep 5
 	@echo "Configuring chinchilla..."
 	@docker run -v $(CURDIR)/:/var/www/ --link $(NAME)-test:consul $(LOCAL_DEV_IMAGE) /var/www/vendor/bin/chinchilla
-	@sleep 5
+	@sleep 10
 
 component-test-run:
 	docker run -v $(CURDIR)/:/var/www/ --link $(NAME)-test:localdev $(LOCAL_DEV_IMAGE) /var/www/vendor/bin/phpunit -c /var/www/phpunit.xml --testsuite component
