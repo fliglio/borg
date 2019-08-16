@@ -60,7 +60,9 @@ class AmqpCollectiveDriver implements CollectiveDriver {
 	 * close connection to rabbitmq channel
 	 */
 	public function close() {
-		$this->ch->close();
+		if (isset($this->ch)) {
+			$this->ch->close();
+		}
 	}
 
 	private function getChannel() {
