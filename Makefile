@@ -32,6 +32,9 @@ test: unit-test component-test
 unit-test:
 	php ./vendor/bin/phpunit -c phpunit.xml --testsuite unit
 
+testWithCoverage:
+	php ./vendor/bin/phpunit -c phpunit-coverage.xml test/unit/
+
 component-test: clean-test component-test-setup component-test-run component-test-teardown
 
 clean-test:
