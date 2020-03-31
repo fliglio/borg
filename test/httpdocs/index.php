@@ -15,4 +15,3 @@ try {
 	error_log($e);
 	http_response_code(500);
 }
-

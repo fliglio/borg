@@ -3,7 +3,6 @@ NAME=borg
 LOCAL_DEV_PORT=8000
 LOCAL_DEV_IMAGE=fliglio/rabbitmq
 
-
 clean: clean-localdev clean-test
 	rm -rf build
 
@@ -63,3 +62,8 @@ component-test-teardown:
 		if test "$$ID" != ""; then docker rm $$ID > /dev/null; fi
 
 
+test-php5: 
+	docker run --env -it --rm -v "$$PWD":/src -w /src kasasa/fliglio-microsvc-dev bash -c "set -e; \
+		php --version; \
+		composer config --global secure-http false; \
+		composer up;"

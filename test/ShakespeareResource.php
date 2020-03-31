@@ -2,10 +2,7 @@
 
 namespace Fliglio\Borg;
 
-use Fliglio\Web\GetParam;
-
 use Fliglio\Borg\BorgImplant;
-
 
 class ShakespeareResource {
 	use BorgImplant;
@@ -139,4 +136,5 @@ class ShakespeareResource {
 		}
 		return $miss;
 	}
+	
 }

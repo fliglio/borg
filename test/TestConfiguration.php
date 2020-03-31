@@ -5,13 +5,8 @@ namespace Fliglio\Borg;
 use Fliglio\Http\Http;
 use Fliglio\Routing\Type\RouteBuilder;
 use Fliglio\Fli\Configuration\DefaultConfiguration;
-
-use GuzzleHttp\Client;
-
 use Fliglio\Borg\Amqp\AmqpCollectiveDriver;
-use Fliglio\Borg\Amqp\AmqpChanDriverFactory;
 use Fliglio\Borg\Mapper\DefaultMapper;
-
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 
 class TestConfiguration extends DefaultConfiguration {
@@ -98,5 +93,3 @@ class TestConfiguration extends DefaultConfiguration {
 	}
 
 }
-
-

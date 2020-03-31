@@ -3,7 +3,6 @@
 namespace Fliglio\Borg\Amqp;
 
 use Fliglio\Borg\Driver\ChanDriver;
-
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
@@ -115,4 +114,5 @@ class AmqpChanDriver implements ChanDriver {
 		$ch->queue_bind($this->queueName, $this->exchangeName, $this->queueName);
 		$this->ch = $ch;
 	}
+
 }

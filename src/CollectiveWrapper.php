@@ -2,9 +2,7 @@
 
 namespace Fliglio\Borg;
 
-
 class CollectiveWrapper {
-
 
 	private $drone;
 	private $collective;
@@ -30,8 +28,6 @@ class CollectiveWrapper {
 		$this->retryErrors = $r;
 		return $this;
 	}
-
-
 
 	/**
 	 * Decorate mkchan call to Collective; ensure only local DC usage
@@ -80,5 +76,5 @@ class CollectiveWrapper {
 		$this->collective->dispatch($req);
 		return;
 	}
+	
 }
-

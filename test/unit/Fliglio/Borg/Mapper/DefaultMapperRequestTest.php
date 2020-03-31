@@ -4,7 +4,6 @@ namespace Fliglio\Borg\Mapper;
 use Fliglio\Borg\Chan;
 use Fliglio\Borg\Api\Foo;
 use Fliglio\Borg\Test\MockCollectiveDriverFactory;
-use Fliglio\Borg\RoutineRequest;
 use Fliglio\Borg\RoutineRequestBuilder;
 
 class DefaultMapperRequestTest extends \PHPUnit_Framework_TestCase {
@@ -82,4 +81,3 @@ class DefaultMapperRequestTest extends \PHPUnit_Framework_TestCase {
 	}
 
 }
-

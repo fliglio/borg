@@ -3,9 +3,7 @@
 namespace Fliglio\Borg;
 
 use Fliglio\Web\GetParam;
-
 use Fliglio\Borg\BorgImplant;
-
 
 class TestResource {
 	use BorgImplant;

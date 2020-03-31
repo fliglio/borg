@@ -91,5 +91,5 @@ class ChanTest extends \PHPUnit_Framework_TestCase {
 		// when
 		$ch->add($entity);
 	}
-}
 
+}

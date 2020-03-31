@@ -44,5 +44,5 @@ class FunTest extends \PHPUnit_Framework_TestCase {
 		// then
 		$this->assertEquals($expected, $resp->json());
 	}
-}
 
+}

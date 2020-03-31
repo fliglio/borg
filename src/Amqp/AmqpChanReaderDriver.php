@@ -33,4 +33,5 @@ class AmqpChanReaderDriver implements ChanReaderDriver {
 			usleep(1000); // 1 millisecond
 		}
 	}
+
 }
