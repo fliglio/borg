@@ -60,9 +60,3 @@ component-test-teardown:
 		if test "$$ID" != ""; then docker kill $$ID > /dev/null; fi
 	@ID=$$(docker ps -a | grep "$(NAME)-test" | awk '{ print $$1 }') && \
 		if test "$$ID" != ""; then docker rm $$ID > /dev/null; fi
-
-test-composer-up: 
-	docker run --env -it --rm -v "$$PWD":/src -w /src kasasa/fliglio-microsvc-dev bash -c "set -e; \
-		php --version; \
-		composer config --global secure-http false; \
-		composer up;"
