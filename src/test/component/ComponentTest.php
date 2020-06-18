@@ -12,6 +12,7 @@ class ComponentTest extends \PHPUnit_Framework_TestCase {
 		$this->add = sprintf("http://%s:%s", getenv('LOCALDEV_PORT_80_TCP_ADDR'), 80);
 	}
 
+
 	public function testRoundTrip() {
 		// given
 		$expected = 'hello world';
