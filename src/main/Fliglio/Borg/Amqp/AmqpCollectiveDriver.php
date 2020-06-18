@@ -2,13 +2,10 @@
 
 namespace Fliglio\Borg\Amqp;
 
+use Fliglio\Borg\Driver\CollectiveDriver;
+use Fliglio\Http\RequestReader;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
-
-use Fliglio\Borg\Driver\CollectiveDriver;
-use Fliglio\Borg\Chan;
-
-use Fliglio\Http\RequestReader;
 
 class AmqpCollectiveDriver implements CollectiveDriver {
 

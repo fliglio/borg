@@ -42,6 +42,7 @@ class Collective {
 	public function assimilate($i) {
 		$i->setCollective($this);
 		$this->drones[get_class($i)] = $i;
+		return $this;
 	}
 
 	public function mkchan($type = null) {

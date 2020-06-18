@@ -18,18 +18,16 @@ class TestConfiguration extends DefaultConfiguration {
 
 	public function getRoutes() {
 		$rConn = new AMQPStreamConnection('localhost', 5672, "guest", "guest", "/");
-		$driver = new AmqpCollectiveDriver($rConn);
-	
+
 		$resource = new TestResource();
 		$fun = new FunResource;
 		$shake = new ShakespeareResource;
-		
-		$mapper = new DefaultMapper($driver);
-		$routing = new RoutingConfiguration("borg-demo");
-		$coll = new Collective($driver, $mapper, $routing);
-		$coll->assimilate($resource);
-		$coll->assimilate($fun);
-		$coll->assimilate($shake);
+
+		$coll = (new AmqpCollectiveFactory($rConn, "borg-demo"))
+			->create()
+			->assimilate($resource)
+			->assimilate($fun)
+			->assimilate($shake);
 
 
 
