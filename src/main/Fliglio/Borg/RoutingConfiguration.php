@@ -36,7 +36,7 @@ class RoutingConfiguration {
 		return $this->localRoutingKey;
 	}
 	public function getMasterRoutingKey() {
-		return $this->masterROutingKey;
+		return $this->masterRoutingKey;
 	}
 
 }
