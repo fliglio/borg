@@ -18,16 +18,12 @@ class AmqpCollectiveFactory {
 		$this->routingNamespace = $routingNamespace;
 	}
 
-	public function create($instancesToAssimilate = []) {
+	public function create() {
 		$driver  = new AmqpCollectiveDriver($this->rabbitConnection);
 		$mapper  = new DefaultMapper($driver);
 		$routing = new RoutingConfiguration($this->routingNamespace);
 
-		$coll = new Collective($driver, $mapper, $routing);
-		foreach ($instancesToAssimilate as $inst) {
-			$coll->assimilate($inst);
-		}
-		return $coll;
+		return new Collective($driver, $mapper, $routing);
 	}
 }
 
