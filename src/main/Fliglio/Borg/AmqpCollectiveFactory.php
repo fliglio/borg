@@ -6,11 +6,14 @@ namespace Fliglio\Borg;
 
 use Fliglio\Borg\Amqp\AmqpCollectiveDriver;
 use Fliglio\Borg\Mapper\DefaultMapper;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
 
 class AmqpCollectiveFactory {
+
 	private $rabbitConnection;
 	private $routingNamespace;
-	public function __construct($rabbitConnection, $routingNamespace) {
+
+	public function __construct(AMQPStreamConnection $rabbitConnection, $routingNamespace) {
 		$this->rabbitConnection = $rabbitConnection;
 		$this->routingNamespace = $routingNamespace;
 	}
